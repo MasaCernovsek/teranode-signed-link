@@ -114,8 +114,8 @@ const ProjectView = () => {
             </div>
           </div>
 
-          {/* 3-Column Layout */}
-          <div className="grid grid-cols-12 gap-5">
+          {/* Top row: Parties + Ownership */}
+          <div className="grid grid-cols-12 gap-5 mb-5">
             {/* Left: Parties */}
             <div className="col-span-3">
               <Card>
