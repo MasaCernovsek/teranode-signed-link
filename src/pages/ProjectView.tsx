@@ -235,7 +235,7 @@ const ProjectView = () => {
             </Card>
 
             {/* Ownership Timeline + Activity Feed */}
-            <Card>
+            <Card className="col-span-8">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary" />
