@@ -9,7 +9,7 @@ import StatusBadge from "@/components/StatusBadge";
 import DisputeExportModal from "@/components/DisputeExportModal";
 import NewEnvelopeModal from "@/components/NewEnvelopeModal";
 import BranchingTimeline from "@/components/BranchingTimeline";
-import { projects, CURRENT_USER_COMPANY } from "@/data/dummyData";
+import { projects, CURRENT_USER_COMPANY, type ControlTransferType } from "@/data/dummyData";
 import {
   ArrowLeft, Link2, CheckCircle2, Clock, FileText,
   Building2, Calendar, Banknote, FileCheck, Shield,
