@@ -231,6 +231,12 @@ const ProjectView = () => {
                         <span className="text-muted-foreground">Relevant documents:</span>
                         <span className="font-medium text-foreground">Payment Application #3, Pay-Less Notice, Change Order #1</span>
                       </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-muted-foreground">Freeze scope:</span>
+                        <Badge variant="outline" className="text-xs border-destructive/30 text-destructive bg-destructive/5">
+                          Contested documents only
+                        </Badge>
+                      </div>
                     </div>
                     <Button
                       variant="outline"
