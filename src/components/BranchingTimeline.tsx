@@ -225,20 +225,20 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
                   />
                 )}
                 {/* Name */}
-                <text x={10} y={18} fontSize={10.5} fontWeight={600} fill="#1a1a2e" fontFamily="Inter, sans-serif">
-                  {node.name.length > 24 ? node.name.slice(0, 22) + "…" : node.name}
+                <text x={10} y={16} fontSize={10.5} fontWeight={600} fill="#1a1a2e" fontFamily="Inter, sans-serif">
+                  {node.name.length > 26 ? node.name.slice(0, 24) + "…" : node.name}
                 </text>
                 {/* Party */}
-                <text x={10} y={32} fontSize={9} fill={trackColor} fontFamily="Inter, sans-serif" fontWeight={500}>
-                  {node.party.length > 28 ? node.party.slice(0, 26) + "…" : node.party}
+                <text x={10} y={29} fontSize={9} fill={trackColor} fontFamily="Inter, sans-serif" fontWeight={500}>
+                  {node.party.length > 30 ? node.party.slice(0, 28) + "…" : node.party}
                 </text>
                 {/* Date */}
-                <text x={10} y={44} fontSize={9} fill="#8E9196" fontFamily="Inter, sans-serif">
+                <text x={10} y={41} fontSize={9} fill="#8E9196" fontFamily="Inter, sans-serif">
                   {node.date}
                 </text>
                 {/* Status badge */}
                 <rect
-                  x={10} y={50}
+                  x={10} y={47}
                   width={node.isDisputed ? 80 : node.status === "verified" ? 90 : 60}
                   height={14} rx={3}
                   fill={
@@ -249,7 +249,7 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
                   }
                 />
                 <text
-                  x={14} y={60} fontSize={8} fontWeight={600}
+                  x={14} y={57} fontSize={8} fontWeight={600}
                   fill={
                     node.isDisputed ? "#EF4444" :
                     node.status === "verified" ? "#16A34A" :
@@ -260,10 +260,37 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
                 >
                   {node.isDisputed ? "Disputed ⚠" : cfg.label}
                 </text>
+                {/* Document status badge (Issued/Acknowledged/Signed) */}
+                {node.documentStatus && (
+                  <>
+                    <rect
+                      x={node.isDisputed ? 95 : node.status === "verified" ? 105 : 75}
+                      y={47} width={55} height={14} rx={3}
+                      fill={node.documentStatus === "Signed" ? "#DCFCE7" : node.documentStatus === "Acknowledged" ? "#FEF9C3" : "#DBEAFE"}
+                    />
+                    <text
+                      x={(node.isDisputed ? 99 : node.status === "verified" ? 109 : 79)}
+                      y={57} fontSize={8} fontWeight={600}
+                      fill={node.documentStatus === "Signed" ? "#16A34A" : node.documentStatus === "Acknowledged" ? "#CA8A04" : "#2563EB"}
+                      fontFamily="Inter, sans-serif"
+                    >
+                      {node.documentStatus}
+                    </text>
+                  </>
+                )}
                 {/* Disputed context line */}
-                {node.isDisputed && (
+                {node.isDisputed && node.disputedBy && (
                   <text x={10} y={72} fontSize={7.5} fill="#EF4444" fontFamily="Inter, sans-serif">
-                    Hughes Bros Construction · 10 Apr 2025
+                    {node.disputedBy} · {node.disputeDate}
+                  </text>
+                )}
+                {/* Restricted access label */}
+                {node.accessControl === "restricted" && node.visibleTo && (
+                  <text x={10} y={node.isDisputed ? 83 : 72} fontSize={7.5} fill="#8E9196" fontFamily="Inter, sans-serif">
+                    Visible to: {node.visibleTo.length <= 2
+                      ? node.visibleTo.join(" & ")
+                      : `${node.visibleTo.slice(0, 2).join(", ")} + ${node.visibleTo.length - 2} more`
+                    }
                   </text>
                 )}
               </g>
