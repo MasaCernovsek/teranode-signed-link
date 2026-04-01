@@ -9,8 +9,8 @@ interface BranchingTimelineProps {
   projectId: string;
 }
 
-const NODE_W = 180;
-const NODE_H = 80;
+const NODE_W = 200;
+const NODE_H = 95;
 const COL_GAP = 80;
 const ROW_GAP = 40;
 const TRACK_LABEL_W = 180;
