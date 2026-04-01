@@ -1,6 +1,7 @@
 export interface Party {
   name: string;
   role: string;
+  roles?: string[]; // supports multiple roles for same entity
 }
 
 export interface Document {
@@ -17,8 +18,12 @@ export interface Document {
   statusNote?: string;
   parentDocId?: string;
   parentDocName?: string;
-  owner: string; // Party name that owns this envelope/document
-  accessControl: "public" | "restricted"; // public = all parties can see details, restricted = only owner
+  owner: string;
+  accessControl: "public" | "restricted";
+  disputedBy?: string;
+  disputeDate?: string;
+  disputeReason?: string;
+  documentStatus?: "Issued" | "Acknowledged" | "Signed"; // new tri-state
 }
 
 export interface Envelope {
@@ -33,7 +38,7 @@ export interface Envelope {
   owner: string;
 }
 
-export type ControlTransferType = "Control transfer" | "Assignment" | "Novation" | "Access granted";
+export type ControlTransferType = "Control transfer" | "Assignment" | "Novation" | "Access granted" | "Control withdrawn";
 
 export interface OwnershipTransfer {
   from: string;
@@ -42,6 +47,7 @@ export interface OwnershipTransfer {
   description: string;
   verified: boolean;
   transferType?: ControlTransferType;
+  reason?: string; // e.g. "Termination / Insolvency"
 }
 
 export interface Project {
@@ -60,6 +66,13 @@ export interface Project {
   documents: Document[];
   envelopes: Envelope[];
   ownershipTimeline: OwnershipTransfer[];
+  governingContract?: {
+    name: string;
+    partyA: string;
+    partyB: string;
+    anchoredDate: string;
+  };
+  terminatedParties?: string[]; // party names whose branches are terminated
 }
 
 // Current logged-in user's company
@@ -78,11 +91,18 @@ export const projects: Project[] = [
     partyCount: 3,
     lastActivity: "10 Apr 2025",
     status: "Active",
+    governingContract: {
+      name: "Master Contract (JCT D&B)",
+      partyA: "Apex Homes Ltd",
+      partyB: "Hughes Bros Construction",
+      anchoredDate: "20 Jan 2025, 16:18",
+    },
     parties: [
       { name: "Apex Homes Ltd", role: "Developer" },
       { name: "Hughes Bros Construction", role: "Main Contractor" },
       { name: "RM Groundworks Ltd", role: "Subcontractor" },
     ],
+    terminatedParties: [],
     envelopes: [
       {
         id: "env-nda",
@@ -91,7 +111,7 @@ export const projects: Project[] = [
         completedCount: 3,
         totalSigners: 3,
         tags: ["NDA"],
-        date: "2:34 PM, 14 Jan 2025",
+        date: "14 Jan 2025, 14:34",
         owner: "Apex Homes Ltd",
         documents: [
           {
@@ -103,11 +123,12 @@ export const projects: Project[] = [
             blockchainStatus: "verified",
             issuedBy: "Apex Homes Ltd",
             issuedTo: "All parties",
-            timestamp: "14 Jan 2025, 10:15 AM",
+            timestamp: "14 Jan 2025, 10:15",
             hash: "0x8b2f...a41e",
             statusNote: "Executed by all parties",
             owner: "Apex Homes Ltd",
             accessControl: "public",
+            documentStatus: "Signed",
           },
         ],
       },
@@ -118,7 +139,7 @@ export const projects: Project[] = [
         completedCount: 2,
         totalSigners: 2,
         tags: ["Contract"],
-        date: "2:34 PM, 20 Jan 2025",
+        date: "20 Jan 2025, 16:12",
         owner: "Apex Homes Ltd",
         documents: [
           {
@@ -130,11 +151,12 @@ export const projects: Project[] = [
             blockchainStatus: "verified",
             issuedBy: "Apex Homes Ltd",
             issuedTo: "Hughes Bros Construction",
-            timestamp: "20 Jan 2025, 02:30 PM",
+            timestamp: "20 Jan 2025, 14:30",
             hash: "0x1c4d...b73f",
             statusNote: "Fully executed",
             owner: "Apex Homes Ltd",
             accessControl: "public",
+            documentStatus: "Signed",
           },
         ],
       },
@@ -145,7 +167,7 @@ export const projects: Project[] = [
         completedCount: 2,
         totalSigners: 2,
         tags: ["Change Order"],
-        date: "2:34 PM, 4 Mar 2025",
+        date: "04 Mar 2025, 11:20",
         owner: "Hughes Bros Construction",
         documents: [
           {
@@ -157,11 +179,12 @@ export const projects: Project[] = [
             blockchainStatus: "verified",
             issuedBy: "Hughes Bros Construction",
             issuedTo: "Apex Homes Ltd",
-            timestamp: "4 Mar 2025, 11:20 AM",
+            timestamp: "04 Mar 2025, 11:20",
             hash: "0x5e9a...c28d",
             statusNote: "Approved and signed",
             owner: "Hughes Bros Construction",
             accessControl: "public",
+            documentStatus: "Signed",
           },
         ],
       },
@@ -172,7 +195,7 @@ export const projects: Project[] = [
         completedCount: 1,
         totalSigners: 2,
         tags: ["Payment"],
-        date: "2:34 PM, 1 Apr 2025",
+        date: "01 Apr 2025, 09:00",
         owner: "Hughes Bros Construction",
         documents: [
           {
@@ -184,11 +207,15 @@ export const projects: Project[] = [
             blockchainStatus: "verified",
             issuedBy: "Hughes Bros Construction",
             issuedTo: "Apex Homes Ltd",
-            timestamp: "1 Apr 2025, 09:00 AM",
+            timestamp: "01 Apr 2025, 09:00",
             hash: "0x7d3b...e51a",
             statusNote: "Submitted for review",
             owner: "Hughes Bros Construction",
             accessControl: "restricted",
+            documentStatus: "Issued",
+            disputedBy: "Apex Homes Ltd",
+            disputeDate: "10 Apr 2025",
+            disputeReason: "Valuation disputed — quantities not agreed",
           },
         ],
       },
@@ -199,7 +226,7 @@ export const projects: Project[] = [
         completedCount: 1,
         totalSigners: 1,
         tags: ["Notice"],
-        date: "2:34 PM, 10 Apr 2025",
+        date: "10 Apr 2025, 09:42",
         owner: "Apex Homes Ltd",
         documents: [
           {
@@ -211,13 +238,17 @@ export const projects: Project[] = [
             blockchainStatus: "verified",
             issuedBy: "Apex Homes Ltd",
             issuedTo: "Hughes Bros Construction Ltd",
-            timestamp: "10 Apr 2025, 09:42 AM",
+            timestamp: "10 Apr 2025, 09:42",
             hash: "0x3f7a...d92c",
             statusNote: "Served within contractual window",
             parentDocId: "payment-app-3",
             parentDocName: "Payment Application #3",
             owner: "Apex Homes Ltd",
             accessControl: "public",
+            documentStatus: "Signed",
+            disputedBy: "Hughes Bros Construction",
+            disputeDate: "12 Apr 2025",
+            disputeReason: "Notice timing contested",
           },
         ],
       },
@@ -244,6 +275,7 @@ export const projects: Project[] = [
             statusNote: "Awaiting signature from Apex Homes",
             owner: "Hughes Bros Construction",
             accessControl: "restricted",
+            documentStatus: "Acknowledged",
           },
         ],
       },
@@ -254,7 +286,7 @@ export const projects: Project[] = [
         completedCount: 2,
         totalSigners: 2,
         tags: ["Contract", "Subcontract"],
-        date: "2:34 PM, 28 Jan 2025",
+        date: "28 Jan 2025, 15:15",
         owner: "RM Groundworks Ltd",
         documents: [
           {
@@ -266,11 +298,12 @@ export const projects: Project[] = [
             blockchainStatus: "verified",
             issuedBy: "Hughes Bros Construction",
             issuedTo: "RM Groundworks Ltd",
-            timestamp: "28 Jan 2025, 03:15 PM",
+            timestamp: "28 Jan 2025, 15:15",
             hash: "0x2a8c...f19b",
             statusNote: "Fully executed",
             owner: "RM Groundworks Ltd",
             accessControl: "restricted",
+            documentStatus: "Signed",
           },
         ],
       },
@@ -285,11 +318,12 @@ export const projects: Project[] = [
         blockchainStatus: "verified",
         issuedBy: "Apex Homes Ltd",
         issuedTo: "All parties",
-        timestamp: "14 Jan 2025, 10:15 AM",
+        timestamp: "14 Jan 2025, 10:15",
         hash: "0x8b2f...a41e",
         statusNote: "Executed by all parties",
         owner: "Apex Homes Ltd",
         accessControl: "public",
+        documentStatus: "Signed",
       },
       {
         id: "master-contract",
@@ -300,11 +334,12 @@ export const projects: Project[] = [
         blockchainStatus: "verified",
         issuedBy: "Apex Homes Ltd",
         issuedTo: "Hughes Bros Construction",
-        timestamp: "20 Jan 2025, 02:30 PM",
+        timestamp: "20 Jan 2025, 14:30",
         hash: "0x1c4d...b73f",
         statusNote: "Fully executed",
         owner: "Apex Homes Ltd",
         accessControl: "public",
+        documentStatus: "Signed",
       },
       {
         id: "change-order-1",
@@ -315,11 +350,12 @@ export const projects: Project[] = [
         blockchainStatus: "verified",
         issuedBy: "Hughes Bros Construction",
         issuedTo: "Apex Homes Ltd",
-        timestamp: "4 Mar 2025, 11:20 AM",
+        timestamp: "04 Mar 2025, 11:20",
         hash: "0x5e9a...c28d",
         statusNote: "Approved and signed",
         owner: "Hughes Bros Construction",
         accessControl: "public",
+        documentStatus: "Signed",
       },
       {
         id: "payment-app-3",
@@ -330,11 +366,15 @@ export const projects: Project[] = [
         blockchainStatus: "verified",
         issuedBy: "Hughes Bros Construction",
         issuedTo: "Apex Homes Ltd",
-        timestamp: "1 Apr 2025, 09:00 AM",
+        timestamp: "01 Apr 2025, 09:00",
         hash: "0x7d3b...e51a",
         statusNote: "Submitted for review",
         owner: "Hughes Bros Construction",
         accessControl: "restricted",
+        documentStatus: "Issued",
+        disputedBy: "Apex Homes Ltd",
+        disputeDate: "10 Apr 2025",
+        disputeReason: "Valuation disputed — quantities not agreed",
       },
       {
         id: "pay-less-notice",
@@ -345,13 +385,17 @@ export const projects: Project[] = [
         blockchainStatus: "verified",
         issuedBy: "Apex Homes Ltd",
         issuedTo: "Hughes Bros Construction Ltd",
-        timestamp: "10 Apr 2025, 09:42 AM",
+        timestamp: "10 Apr 2025, 09:42",
         hash: "0x3f7a...d92c",
         statusNote: "Served within contractual window",
         parentDocId: "payment-app-3",
         parentDocName: "Payment Application #3",
         owner: "Apex Homes Ltd",
         accessControl: "public",
+        documentStatus: "Signed",
+        disputedBy: "Hughes Bros Construction",
+        disputeDate: "12 Apr 2025",
+        disputeReason: "Notice timing contested",
       },
       {
         id: "change-order-2",
@@ -366,6 +410,7 @@ export const projects: Project[] = [
         statusNote: "Awaiting signature from Apex Homes",
         owner: "Hughes Bros Construction",
         accessControl: "restricted",
+        documentStatus: "Acknowledged",
       },
     ],
     ownershipTimeline: [
@@ -399,15 +444,48 @@ export const projects: Project[] = [
     partyCount: 4,
     lastActivity: "8 Apr 2025",
     status: "In Dispute",
+    governingContract: {
+      name: "Main Works Contract (NEC4)",
+      partyA: "Northern Developments PLC",
+      partyB: "Balfour Group",
+      anchoredDate: "01 Mar 2025, 10:00",
+    },
     parties: [
       { name: "Northern Developments PLC", role: "Developer" },
       { name: "Balfour Group", role: "Main Contractor" },
       { name: "Spark Electrical Ltd", role: "Subcontractor" },
       { name: "CoolAir Systems", role: "Subcontractor" },
     ],
+    terminatedParties: ["CoolAir Systems"],
     documents: [],
     envelopes: [],
-    ownershipTimeline: [],
+    ownershipTimeline: [
+      {
+        from: "Northern Developments PLC",
+        to: "Balfour Group",
+        date: "01 Mar 2025",
+        description: "Main works control delegated under NEC4",
+        verified: true,
+        transferType: "Control transfer",
+      },
+      {
+        from: "Balfour Group",
+        to: "CoolAir Systems",
+        date: "15 Mar 2025",
+        description: "HVAC package access granted",
+        verified: true,
+        transferType: "Access granted",
+      },
+      {
+        from: "CoolAir Systems",
+        to: "Balfour Group",
+        date: "05 Apr 2025",
+        description: "HVAC package control reverted due to insolvency",
+        verified: true,
+        transferType: "Control withdrawn",
+        reason: "Termination / Insolvency",
+      },
+    ],
   },
   {
     id: "m62",
@@ -447,6 +525,7 @@ export const projects: Project[] = [
     parties: [
       { name: "Canary Wharf Group", role: "Client" },
       { name: "Mace Ltd", role: "Main Contractor" },
+      { name: "Mace Ltd", role: "Consultant", roles: ["Main Contractor", "Consultant"] },
       { name: "Arup", role: "Consultant" },
       { name: "ISG Interior Services", role: "Subcontractor" },
     ],
