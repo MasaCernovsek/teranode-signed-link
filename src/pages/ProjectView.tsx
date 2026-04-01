@@ -9,6 +9,7 @@ import StatusBadge from "@/components/StatusBadge";
 import DisputeExportModal from "@/components/DisputeExportModal";
 import NewEnvelopeModal from "@/components/NewEnvelopeModal";
 import AddParticipantModal from "@/components/AddParticipantModal";
+import SubcontractorRequestModal from "@/components/SubcontractorRequestModal";
 import BranchingTimeline from "@/components/BranchingTimeline";
 import { projects, CURRENT_USER_COMPANY, type ControlTransferType } from "@/data/dummyData";
 import {
@@ -16,7 +17,7 @@ import {
   Building2, Calendar, Banknote, FileCheck, Shield,
   Plus, Lock, Eye, Download, Send, GitBranch, List,
   AlertTriangle, Activity, Moon, Sun, Users, GitMerge,
-  ChevronDown,
+  ChevronDown, XCircle,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -25,6 +26,9 @@ import { useThemeContext } from "@/hooks/useTheme";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -32,11 +36,14 @@ const ProjectView = () => {
   const [exportOpen, setExportOpen] = useState(false);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
   const [addParticipantOpen, setAddParticipantOpen] = useState(false);
+  const [subRequestOpen, setSubRequestOpen] = useState(false);
+  const [addChoiceOpen, setAddChoiceOpen] = useState(false);
   const [filterOwner, setFilterOwner] = useState<"all" | "mine" | "others">("all");
   const [viewMode, setViewMode] = useState<"list" | "branch">("branch");
   const [filterParty, setFilterParty] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
+  const [subRequests, setSubRequests] = useState<{ action: string; date: string; type: "request" }[]>([]);
   const { theme, toggleTheme } = useThemeContext();
 
   const project = projects.find((p) => p.id === id);
@@ -48,6 +55,7 @@ const ProjectView = () => {
   const currentUserParty = project.parties.find(p => p.name === CURRENT_USER_COMPANY);
   const currentUserRole = currentUserParty?.role ?? "";
   const canCreateDownstream = ["Developer", "Main Contractor"].includes(currentUserRole);
+  const isSubcontractor = currentUserRole === "Subcontractor";
 
   const filteredEnvelopes = project.envelopes
     .filter((env) => {
@@ -78,9 +86,10 @@ const ProjectView = () => {
   const uniqueTypes = [...new Set(project.envelopes.flatMap(e => e.tags))];
 
   const isDisputed = project.status === "In Dispute";
-  const disputedEnvelopes = project.envelopes.filter(e =>
-    e.documents.some(d => d.blockchainStatus === "verified" && d.statusNote?.toLowerCase().includes("disputed")) ||
-    e.tags.includes("Notice")
+
+  // Collect all disputed documents across all envelopes
+  const allDisputedDocs = project.envelopes.flatMap(e =>
+    e.documents.filter(d => d.disputedBy)
   );
 
   // Activity feed with 24h timestamps
@@ -95,7 +104,41 @@ const ProjectView = () => {
     { action: `Hughes Bros Construction submitted "Payment Application #3"`, date: "01 Apr 2025, 09:00", type: "create" as const },
     { action: `Apex Homes Ltd issued "Pay-Less Notice"`, date: "10 Apr 2025, 09:42", type: "create" as const },
     { action: `"Pay-Less Notice" anchored to blockchain`, date: "10 Apr 2025, 09:45", type: "blockchain" as const },
+    ...subRequests.map(r => ({ ...r, type: "request" as const })),
   ].reverse().slice(0, 8);
+
+  // Helper: get parties with deduplicated multi-role display
+  const getDisplayParties = () => {
+    const partyMap = new Map<string, string[]>();
+    project.parties.forEach(p => {
+      const existing = partyMap.get(p.name);
+      if (existing) {
+        if (!existing.includes(p.role)) existing.push(p.role);
+      } else {
+        partyMap.set(p.name, p.roles ? [...p.roles] : [p.role]);
+      }
+    });
+    return Array.from(partyMap.entries()).map(([name, roles]) => ({ name, roles }));
+  };
+
+  const displayParties = getDisplayParties();
+
+  const handleSubRequest = (name: string, reason: string) => {
+    const now = new Date();
+    const dateStr = `${now.getDate().toString().padStart(2, "0")} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][now.getMonth()]} ${now.getFullYear()}, ${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+    setSubRequests(prev => [...prev, {
+      action: `${CURRENT_USER_COMPANY} requested new subcontractor: ${name} — (awaiting approval)`,
+      date: dateStr,
+      type: "request",
+    }]);
+  };
+
+  // Document status badge colors
+  const docStatusConfig = {
+    Issued: { cls: "border-secondary/30 text-secondary bg-secondary/5", label: "Issued" },
+    Acknowledged: { cls: "border-warning/30 text-warning bg-warning/5", label: "Acknowledged" },
+    Signed: { cls: "border-accent/30 text-accent bg-accent/5", label: "Signed" },
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -157,42 +200,10 @@ const ProjectView = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add to Project
-                    <ChevronDown className="h-3 w-3 ml-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-72">
-                  <DropdownMenuItem onClick={() => setAddParticipantOpen(true)} className="flex items-start gap-3 py-3 cursor-pointer">
-                    <Users className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">Add project participant</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Add a company to the project party list, with no documents yet</p>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {canCreateDownstream ? (
-                    <DropdownMenuItem onClick={() => setEnvelopeOpen(true)} className="flex items-start gap-3 py-3 cursor-pointer">
-                      <GitMerge className="h-4 w-4 mt-0.5 shrink-0 text-secondary" />
-                      <div>
-                        <p className="text-sm font-medium">Create downstream contract</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">Create a new branch under your party in the contract timeline</p>
-                      </div>
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem disabled className="flex items-start gap-3 py-3 opacity-60">
-                      <GitMerge className="h-4 w-4 mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium">Request new subcontract</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">Submit a request to create a downstream contract</p>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button className="gap-2" onClick={() => setAddChoiceOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Add to Project
+              </Button>
               <Button
                 variant="outline"
                 className="gap-2 border-primary/30 text-primary hover:bg-primary/5"
@@ -203,6 +214,60 @@ const ProjectView = () => {
               </Button>
             </div>
           </div>
+
+          {/* Two-step Add Choice Dialog */}
+          <Dialog open={addChoiceOpen} onOpenChange={setAddChoiceOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Add to Project</DialogTitle>
+                <DialogDescription>Choose what you'd like to add to this project.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 py-2">
+                <button
+                  onClick={() => { setAddChoiceOpen(false); setAddParticipantOpen(true); }}
+                  className="w-full flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/[0.02] transition-colors text-left"
+                >
+                  <Users className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Add project participant</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Add a company to the project party list. No documents will be created yet.</p>
+                  </div>
+                </button>
+                {canCreateDownstream ? (
+                  <button
+                    onClick={() => { setAddChoiceOpen(false); setEnvelopeOpen(true); }}
+                    className="w-full flex items-start gap-3 p-4 rounded-lg border border-border hover:border-secondary/30 hover:bg-secondary/[0.02] transition-colors text-left"
+                  >
+                    <GitMerge className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Create downstream contract</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Create a new branch under your party in the contract timeline.</p>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="w-full flex items-start gap-3 p-4 rounded-lg border border-border opacity-50 text-left">
+                    <GitMerge className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-muted-foreground">Create downstream contract</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Not permitted for your role. Only Developer and Main Contractor roles can create downstream contracts.</p>
+                    </div>
+                  </div>
+                )}
+                {isSubcontractor && (
+                  <button
+                    onClick={() => { setAddChoiceOpen(false); setSubRequestOpen(true); }}
+                    className="w-full flex items-start gap-3 p-4 rounded-lg border border-border hover:border-warning/30 hover:bg-warning/[0.02] transition-colors text-left"
+                  >
+                    <Send className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Request new subcontractor</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Submit a request for approval by the Developer or Main Contractor.</p>
+                    </div>
+                  </button>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Dispute Mode Banner */}
           {isDisputed && (
@@ -216,22 +281,12 @@ const ProjectView = () => {
                       This project has an active dispute. All document modifications are frozen and audit trails are being preserved for evidence.
                     </p>
                     <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground">Contested document:</span>
-                        <span className="font-medium text-foreground">Pay-Less Notice</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground">Raised by:</span>
-                        <span className="font-medium text-foreground">Hughes Bros Construction</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground">Dispute date:</span>
-                        <span className="font-medium text-foreground">10 Mar 2025</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground">Relevant documents:</span>
-                        <span className="font-medium text-foreground">Payment Application #3, Pay-Less Notice, Change Order #1</span>
-                      </div>
+                      {allDisputedDocs.length > 0 && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-muted-foreground">Contested documents:</span>
+                          <span className="font-medium text-foreground">{allDisputedDocs.map(d => d.name).join(", ")}</span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 text-xs">
                         <span className="text-muted-foreground">Freeze scope:</span>
                         <Badge variant="outline" className="text-xs border-destructive/30 text-destructive bg-destructive/5">
@@ -262,27 +317,33 @@ const ProjectView = () => {
                 <CardTitle className="text-sm font-semibold">Parties Involved</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 px-4 pb-4">
-                {project.parties.map((party) => (
-                  <div key={party.name} className="flex items-center gap-2">
-                    <Building2 className={cn(
-                      "h-3.5 w-3.5 shrink-0",
-                      party.name === CURRENT_USER_COMPANY ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground leading-tight">
-                        {party.name}
-                        {party.name === CURRENT_USER_COMPANY && (
-                          <span className="text-xs ml-1.5 text-primary font-semibold">(You)</span>
-                        )}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{party.role}</p>
+                {displayParties.map((party) => {
+                  const isTerminated = project.terminatedParties?.includes(party.name);
+                  return (
+                    <div key={party.name} className={cn("flex items-center gap-2", isTerminated && "opacity-50")}>
+                      <Building2 className={cn(
+                        "h-3.5 w-3.5 shrink-0",
+                        isTerminated ? "text-destructive" : party.name === CURRENT_USER_COMPANY ? "text-primary" : "text-muted-foreground"
+                      )} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground leading-tight">
+                          {party.name}
+                          {party.name === CURRENT_USER_COMPANY && (
+                            <span className="text-xs ml-1.5 text-primary font-semibold">(You)</span>
+                          )}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {party.roles.length > 1 ? party.roles.join(", ") : party.roles[0]}
+                          {isTerminated && <span className="text-destructive ml-1">— Terminated</span>}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
 
-            {/* Ownership Timeline + Activity Feed */}
+            {/* Project Control Timeline + Activity Feed */}
             <Card className="col-span-8">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -291,33 +352,51 @@ const ProjectView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Ownership transfers */}
+                {/* Control transfers */}
                 <div className="space-y-3 mb-4">
-                  {project.ownershipTimeline.map((transfer, i) => (
-                    <div key={i} className="relative pl-5">
-                      {i < project.ownershipTimeline.length - 1 && (
-                        <div className="absolute left-[7px] top-5 bottom-0 w-px bg-primary/20" />
-                      )}
-                      <div className="absolute left-0 top-1 h-3.5 w-3.5 rounded-full bg-primary/15 flex items-center justify-center">
-                        <Link2 className="h-2.5 w-2.5 text-primary" />
-                      </div>
-                      <Badge variant="outline" className="text-xs mb-0.5 border-primary/20 text-primary bg-primary/5">
-                        {transfer.transferType ?? "Control transfer"}
-                      </Badge>
-                      <p className="text-xs font-medium text-foreground leading-snug">{transfer.description}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {transfer.from} → {transfer.to}
-                      </p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-xs text-muted-foreground">{transfer.date}</span>
-                        {transfer.verified && (
-                          <span className="text-xs text-accent flex items-center gap-0.5">
-                            <CheckCircle2 className="h-2.5 w-2.5" /> On-chain verified
-                          </span>
+                  {project.ownershipTimeline.map((transfer, i) => {
+                    const isWithdrawn = transfer.transferType === "Control withdrawn";
+                    return (
+                      <div key={i} className="relative pl-5">
+                        {i < project.ownershipTimeline.length - 1 && (
+                          <div className="absolute left-[7px] top-5 bottom-0 w-px bg-primary/20" />
                         )}
+                        <div className={cn(
+                          "absolute left-0 top-1 h-3.5 w-3.5 rounded-full flex items-center justify-center",
+                          isWithdrawn ? "bg-destructive/15" : "bg-primary/15"
+                        )}>
+                          {isWithdrawn ? (
+                            <XCircle className="h-2.5 w-2.5 text-destructive" />
+                          ) : (
+                            <Link2 className="h-2.5 w-2.5 text-primary" />
+                          )}
+                        </div>
+                        <Badge variant="outline" className={cn(
+                          "text-xs mb-0.5",
+                          isWithdrawn
+                            ? "border-destructive/20 text-destructive bg-destructive/5"
+                            : "border-primary/20 text-primary bg-primary/5"
+                        )}>
+                          {transfer.transferType ?? "Control transfer"}
+                        </Badge>
+                        <p className="text-xs font-medium text-foreground leading-snug">{transfer.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {transfer.from} → {transfer.to}
+                        </p>
+                        {transfer.reason && (
+                          <p className="text-xs text-destructive mt-0.5">Reason: {transfer.reason}</p>
+                        )}
+                        <div className="flex items-center gap-1 mt-1">
+                          <span className="text-xs text-muted-foreground">{transfer.date}</span>
+                          {transfer.verified && (
+                            <span className="text-xs text-accent flex items-center gap-0.5">
+                              <CheckCircle2 className="h-2.5 w-2.5" /> On-chain verified
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Activity feed */}
@@ -331,6 +410,8 @@ const ProjectView = () => {
                             <Link2 className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
                           ) : item.type === "sign" ? (
                             <CheckCircle2 className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
+                          ) : item.type === "request" ? (
+                            <Send className="h-3.5 w-3.5 text-warning shrink-0 mt-0.5" />
                           ) : (
                             <Send className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
                           )}
@@ -349,6 +430,21 @@ const ProjectView = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Governing Contract Banner */}
+          {project.governingContract && (
+            <div className="mb-3 px-4 py-2.5 rounded-lg border border-primary/15 bg-primary/[0.02] flex items-center gap-3">
+              <Shield className="h-4 w-4 text-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-foreground">
+                  <span className="text-muted-foreground">Governing contract:</span>{" "}
+                  {project.governingContract.name} ({project.governingContract.partyA} ↔ {project.governingContract.partyB})
+                  <span className="text-muted-foreground"> — anchored to blockchain {project.governingContract.anchoredDate}</span>
+                </p>
+              </div>
+              <CheckCircle2 className="h-3.5 w-3.5 text-accent shrink-0" />
+            </div>
+          )}
 
           {/* FULL WIDTH: Contract Timeline */}
           <Card>
@@ -466,17 +562,33 @@ const ProjectView = () => {
                     const isMine = env.owner === CURRENT_USER_COMPANY;
                     const isRestricted = env.documents.some((d) => d.accessControl === "restricted") && !isMine;
                     const progressPct = env.totalSigners > 0 ? (env.completedCount / env.totalSigners) * 100 : 0;
+                    const isTerminatedOwner = project.terminatedParties?.includes(env.owner);
+
+                    // Check for disputed docs in this envelope
+                    const disputedDocs = env.documents.filter(d => d.disputedBy);
+
+                    // Visible-to parties for restricted docs
+                    const visibleParties = env.documents.flatMap(d => d.parties);
+                    const uniqueVisible = [...new Set(visibleParties)];
 
                     return (
                       <div
                         key={env.id}
                         className={cn(
                           "p-3 rounded-md border transition-colors",
-                          isMine
-                            ? "border-primary/15 bg-primary/[0.02] hover:bg-primary/5"
-                            : "border-border hover:bg-muted/50"
+                          isTerminatedOwner
+                            ? "border-muted-foreground/20 bg-muted/30 opacity-60"
+                            : isMine
+                              ? "border-primary/15 bg-primary/[0.02] hover:bg-primary/5"
+                              : "border-border hover:bg-muted/50"
                         )}
                       >
+                        {isTerminatedOwner && (
+                          <div className="flex items-center gap-1.5 mb-2 text-xs text-destructive">
+                            <XCircle className="h-3 w-3" />
+                            Party terminated — branch preserved for evidence only
+                          </div>
+                        )}
                         <div className="flex items-start gap-3">
                           {isRestricted ? (
                             <Lock className={cn("h-4 w-4 mt-0.5 shrink-0 text-muted-foreground")} />
@@ -488,10 +600,18 @@ const ProjectView = () => {
                             <div className="flex items-start justify-between gap-2 mb-1">
                               <div className="min-w-0">
                                 {isRestricted ? (
-                                  <p className="text-sm font-medium text-muted-foreground italic">
-                                    {env.name.split("—")[0].trim()}
-                                    <span className="text-xs ml-1.5 text-muted-foreground/70">— Restricted Access</span>
-                                  </p>
+                                  <div>
+                                    <p className="text-sm font-medium text-muted-foreground italic">
+                                      {env.name.split("—")[0].trim()}
+                                      <span className="text-xs ml-1.5 text-muted-foreground/70">— Restricted Access</span>
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                      Visible to: {uniqueVisible.length <= 2
+                                        ? uniqueVisible.join(" and ")
+                                        : `${uniqueVisible.slice(0, 2).join(", ")} + ${uniqueVisible.length - 2} more`
+                                      }
+                                    </p>
+                                  </div>
                                 ) : (
                                   <Link
                                     to={`/project/${project.id}/envelope/${env.id}`}
@@ -527,6 +647,16 @@ const ProjectView = () => {
                               >
                                 {env.status}
                               </Badge>
+                              {/* Document status badges */}
+                              {env.documents.map(d => d.documentStatus && (
+                                <Badge
+                                  key={d.id}
+                                  variant="outline"
+                                  className={cn("text-xs px-1.5 py-0 font-medium", docStatusConfig[d.documentStatus]?.cls)}
+                                >
+                                  {d.documentStatus}
+                                </Badge>
+                              ))}
                               {env.status === "In Progress" && (
                                 <div className="flex items-center gap-2 flex-1">
                                   <Progress value={progressPct} className="h-1.5 flex-1 max-w-24" />
@@ -536,6 +666,18 @@ const ProjectView = () => {
                                 </div>
                               )}
                             </div>
+
+                            {/* Disputed documents */}
+                            {disputedDocs.map(d => (
+                              <div key={d.id} className="flex items-center gap-1.5 mb-1">
+                                <Badge variant="outline" className="text-xs border-destructive/30 text-destructive bg-destructive/5 px-1.5 py-0">
+                                  Disputed
+                                </Badge>
+                                <span className="text-xs text-destructive">
+                                  Contested by {d.disputedBy} on {d.disputeDate}
+                                </span>
+                              </div>
+                            ))}
 
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className={cn(
@@ -600,6 +742,12 @@ const ProjectView = () => {
       <AddParticipantModal
         open={addParticipantOpen}
         onOpenChange={setAddParticipantOpen}
+      />
+      <SubcontractorRequestModal
+        open={subRequestOpen}
+        onOpenChange={setSubRequestOpen}
+        requestingParty={CURRENT_USER_COMPANY}
+        onSubmit={handleSubRequest}
       />
     </div>
   );
