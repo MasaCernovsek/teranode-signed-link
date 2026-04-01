@@ -156,13 +156,42 @@ const ProjectView = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setEnvelopeOpen(true)}
-                className="gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Document
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add to Project
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-72">
+                  <DropdownMenuItem onClick={() => setAddParticipantOpen(true)} className="flex items-start gap-3 py-3 cursor-pointer">
+                    <Users className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Add project participant</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Add a company to the project party list, with no documents yet</p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {canCreateDownstream ? (
+                    <DropdownMenuItem onClick={() => setEnvelopeOpen(true)} className="flex items-start gap-3 py-3 cursor-pointer">
+                      <GitMerge className="h-4 w-4 mt-0.5 shrink-0 text-secondary" />
+                      <div>
+                        <p className="text-sm font-medium">Create downstream contract</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Create a new branch under your party in the contract timeline</p>
+                      </div>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem disabled className="flex items-start gap-3 py-3 opacity-60">
+                      <GitMerge className="h-4 w-4 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium">Request new subcontract</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Submit a request to create a downstream contract</p>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="outline"
                 className="gap-2 border-primary/30 text-primary hover:bg-primary/5"
