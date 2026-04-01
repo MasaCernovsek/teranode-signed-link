@@ -31,18 +31,6 @@ const ProjectView = () => {
   const [exportOpen, setExportOpen] = useState(false);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
   const [addParticipantOpen, setAddParticipantOpen] = useState(false);
-
-  // Project-level setting: who can create downstream contracts
-  // Options: "developer_only" | "developer_and_main" | "any_party"
-  const downstreamPermission = "developer_and_main" as const;
-
-  // Determine current user's role in this project
-  const currentUserParty = project?.parties.find(p => p.name === CURRENT_USER_COMPANY);
-  const currentUserRole = currentUserParty?.role ?? "";
-  const canCreateDownstream =
-    downstreamPermission === "any_party" ||
-    (downstreamPermission === "developer_and_main" && (currentUserRole === "Developer" || currentUserRole === "Main Contractor")) ||
-    (downstreamPermission === "developer_only" && currentUserRole === "Developer");
   const [filterOwner, setFilterOwner] = useState<"all" | "mine" | "others">("all");
   const [viewMode, setViewMode] = useState<"list" | "branch">("branch");
   const [filterParty, setFilterParty] = useState<string>("all");
@@ -52,6 +40,18 @@ const ProjectView = () => {
 
   const project = projects.find((p) => p.id === id);
   if (!project) return <div className="p-8">Project not found.</div>;
+
+  // Project-level setting: who can create downstream contracts
+  type DownstreamPerm = "developer_only" | "developer_and_main" | "any_party";
+  const downstreamPermission: DownstreamPerm = "developer_and_main";
+
+  // Determine current user's role in this project
+  const currentUserParty = project.parties.find(p => p.name === CURRENT_USER_COMPANY);
+  const currentUserRole = currentUserParty?.role ?? "";
+  const canCreateDownstream =
+    downstreamPermission === "any_party" ||
+    (downstreamPermission === "developer_and_main" && (currentUserRole === "Developer" || currentUserRole === "Main Contractor")) ||
+    (downstreamPermission === "developer_only" && currentUserRole === "Developer");
 
   const filteredEnvelopes = project.envelopes
     .filter((env) => {
