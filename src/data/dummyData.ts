@@ -33,12 +33,15 @@ export interface Envelope {
   owner: string;
 }
 
+export type ControlTransferType = "Control transfer" | "Assignment" | "Novation" | "Access granted";
+
 export interface OwnershipTransfer {
   from: string;
   to: string;
   date: string;
   description: string;
   verified: boolean;
+  transferType?: ControlTransferType;
 }
 
 export interface Project {
@@ -367,18 +370,20 @@ export const projects: Project[] = [
     ],
     ownershipTimeline: [
       {
-        from: "Apex Homes",
+        from: "Apex Homes Ltd",
         to: "Hughes Bros Construction",
         date: "20 Jan 2025",
-        description: "Project control transferred",
+        description: "Main works control delegated under JCT D&B",
         verified: true,
+        transferType: "Control transfer",
       },
       {
-        from: "Hughes Bros",
-        to: "RM Groundworks",
+        from: "Hughes Bros Construction",
+        to: "RM Groundworks Ltd",
         date: "3 Feb 2025",
-        description: "Site access transferred",
+        description: "Piling & excavation package site access",
         verified: true,
+        transferType: "Access granted",
       },
     ],
   },

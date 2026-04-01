@@ -8,24 +8,30 @@ import BlockchainBadge from "@/components/BlockchainBadge";
 import StatusBadge from "@/components/StatusBadge";
 import DisputeExportModal from "@/components/DisputeExportModal";
 import NewEnvelopeModal from "@/components/NewEnvelopeModal";
+import AddParticipantModal from "@/components/AddParticipantModal";
 import BranchingTimeline from "@/components/BranchingTimeline";
-import { projects, CURRENT_USER_COMPANY } from "@/data/dummyData";
+import { projects, CURRENT_USER_COMPANY, type ControlTransferType } from "@/data/dummyData";
 import {
   ArrowLeft, Link2, CheckCircle2, Clock, FileText,
   Building2, Calendar, Banknote, FileCheck, Shield,
   Plus, Lock, Eye, Download, Send, GitBranch, List,
-  AlertTriangle, Activity, Moon, Sun,
+  AlertTriangle, Activity, Moon, Sun, Users, GitMerge,
+  ChevronDown,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useThemeContext } from "@/hooks/useTheme";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 const ProjectView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [exportOpen, setExportOpen] = useState(false);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
+  const [addParticipantOpen, setAddParticipantOpen] = useState(false);
   const [filterOwner, setFilterOwner] = useState<"all" | "mine" | "others">("all");
   const [viewMode, setViewMode] = useState<"list" | "branch">("branch");
   const [filterParty, setFilterParty] = useState<string>("all");
@@ -35,6 +41,13 @@ const ProjectView = () => {
 
   const project = projects.find((p) => p.id === id);
   if (!project) return <div className="p-8">Project not found.</div>;
+
+  // Project-level setting: who can create downstream contracts
+  const downstreamPermission = "developer_and_main"; // "developer_only" | "developer_and_main" | "any_party"
+
+  const currentUserParty = project.parties.find(p => p.name === CURRENT_USER_COMPANY);
+  const currentUserRole = currentUserParty?.role ?? "";
+  const canCreateDownstream = ["Developer", "Main Contractor"].includes(currentUserRole);
 
   const filteredEnvelopes = project.envelopes
     .filter((env) => {
@@ -144,13 +157,42 @@ const ProjectView = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setEnvelopeOpen(true)}
-                className="gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Document
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add to Project
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-72">
+                  <DropdownMenuItem onClick={() => setAddParticipantOpen(true)} className="flex items-start gap-3 py-3 cursor-pointer">
+                    <Users className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Add project participant</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Add a company to the project party list, with no documents yet</p>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {canCreateDownstream ? (
+                    <DropdownMenuItem onClick={() => setEnvelopeOpen(true)} className="flex items-start gap-3 py-3 cursor-pointer">
+                      <GitMerge className="h-4 w-4 mt-0.5 shrink-0 text-secondary" />
+                      <div>
+                        <p className="text-sm font-medium">Create downstream contract</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Create a new branch under your party in the contract timeline</p>
+                      </div>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem disabled className="flex items-start gap-3 py-3 opacity-60">
+                      <GitMerge className="h-4 w-4 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium">Request new subcontract</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Submit a request to create a downstream contract</p>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="outline"
                 className="gap-2 border-primary/30 text-primary hover:bg-primary/5"
@@ -189,6 +231,12 @@ const ProjectView = () => {
                       <div className="flex items-center gap-2 text-xs">
                         <span className="text-muted-foreground">Relevant documents:</span>
                         <span className="font-medium text-foreground">Payment Application #3, Pay-Less Notice, Change Order #1</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-muted-foreground">Freeze scope:</span>
+                        <Badge variant="outline" className="text-xs border-destructive/30 text-destructive bg-destructive/5">
+                          Contested documents only
+                        </Badge>
                       </div>
                     </div>
                     <Button
@@ -239,7 +287,7 @@ const ProjectView = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary" />
-                  Activity & Ownership
+                  Project Control Timeline
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -253,6 +301,9 @@ const ProjectView = () => {
                       <div className="absolute left-0 top-1 h-3.5 w-3.5 rounded-full bg-primary/15 flex items-center justify-center">
                         <Link2 className="h-2.5 w-2.5 text-primary" />
                       </div>
+                      <Badge variant="outline" className="text-xs mb-0.5 border-primary/20 text-primary bg-primary/5">
+                        {transfer.transferType ?? "Control transfer"}
+                      </Badge>
                       <p className="text-xs font-medium text-foreground leading-snug">{transfer.description}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {transfer.from} → {transfer.to}
@@ -545,6 +596,10 @@ const ProjectView = () => {
         open={envelopeOpen}
         onOpenChange={setEnvelopeOpen}
         parties={project.parties}
+      />
+      <AddParticipantModal
+        open={addParticipantOpen}
+        onOpenChange={setAddParticipantOpen}
       />
     </div>
   );
