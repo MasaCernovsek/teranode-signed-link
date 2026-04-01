@@ -14,7 +14,8 @@ import {
   ArrowLeft, Link2, CheckCircle2, Clock, FileText,
   Building2, Calendar, Banknote, FileCheck, Shield,
   Plus, Lock, Eye, Download, Send, GitBranch, List,
-  AlertTriangle, Activity, Moon, Sun,
+  AlertTriangle, Activity, Moon, Sun, Users, GitMerge,
+  ChevronDown,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
