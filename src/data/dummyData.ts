@@ -33,12 +33,15 @@ export interface Envelope {
   owner: string;
 }
 
+export type ControlTransferType = "Control transfer" | "Assignment" | "Novation" | "Access granted";
+
 export interface OwnershipTransfer {
   from: string;
   to: string;
   date: string;
   description: string;
   verified: boolean;
+  transferType?: ControlTransferType;
 }
 
 export interface Project {
