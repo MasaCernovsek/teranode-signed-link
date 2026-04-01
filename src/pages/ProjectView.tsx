@@ -8,6 +8,7 @@ import BlockchainBadge from "@/components/BlockchainBadge";
 import StatusBadge from "@/components/StatusBadge";
 import DisputeExportModal from "@/components/DisputeExportModal";
 import NewEnvelopeModal from "@/components/NewEnvelopeModal";
+import AddParticipantModal from "@/components/AddParticipantModal";
 import BranchingTimeline from "@/components/BranchingTimeline";
 import { projects, CURRENT_USER_COMPANY, type ControlTransferType } from "@/data/dummyData";
 import {
