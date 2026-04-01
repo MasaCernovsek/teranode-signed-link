@@ -286,7 +286,7 @@ const ProjectView = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Activity className="h-4 w-4 text-primary" />
-                  Activity & Ownership
+                  Project Control Timeline
                 </CardTitle>
               </CardHeader>
               <CardContent>
