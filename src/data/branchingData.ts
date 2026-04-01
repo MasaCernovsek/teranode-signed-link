@@ -8,11 +8,16 @@ export interface TreeNode {
   date: string;
   time?: string;
   status: "verified" | "signed" | "pending" | "disputed" | "future";
+  documentStatus?: "Issued" | "Acknowledged" | "Signed";
   parentIds: string[]; // supports convergence (multiple parents)
   isMilestone?: boolean;
   isDisputed?: boolean;
+  disputedBy?: string;
+  disputeDate?: string;
   blockingNote?: string;
   column: number; // horizontal position (left to right, 0-based)
+  accessControl?: "public" | "restricted";
+  visibleTo?: string[];
 }
 
 export interface PartyTrack {
@@ -20,6 +25,8 @@ export interface PartyTrack {
   color: string; // tailwind-friendly color class
   colorHex: string;
   trackIndex: number;
+  terminated?: boolean;
+  terminatedDate?: string;
 }
 
 export const partyTracks: PartyTrack[] = [
@@ -38,8 +45,10 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 0,
     date: "20 Jan 2025",
     status: "verified",
+    documentStatus: "Signed",
     parentIds: [],
     column: 0,
+    accessControl: "public",
   },
   // BRANCH A — Apex Homes (track 1)
   {
@@ -49,8 +58,10 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 1,
     date: "14 Feb 2025",
     status: "signed",
+    documentStatus: "Signed",
     parentIds: ["master-contract"],
     column: 1,
+    accessControl: "public",
   },
   {
     id: "revised-payment-schedule",
@@ -59,8 +70,10 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 1,
     date: "20 Feb 2025",
     status: "signed",
+    documentStatus: "Acknowledged",
     parentIds: ["amendment-sow"],
     column: 2,
+    accessControl: "public",
   },
   {
     id: "change-order-3",
@@ -69,8 +82,10 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 1,
     date: "10 Mar 2025",
     status: "pending",
+    documentStatus: "Issued",
     parentIds: ["revised-payment-schedule"],
     column: 3,
+    accessControl: "public",
   },
   // BRANCH B — Hughes Bros (track 2)
   {
@@ -80,8 +95,11 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 2,
     date: "3 Feb 2025",
     status: "verified",
+    documentStatus: "Signed",
     parentIds: ["master-contract"],
     column: 1,
+    accessControl: "restricted",
+    visibleTo: ["Hughes Bros Construction", "RM Groundworks Ltd"],
   },
   {
     id: "payment-app-4",
@@ -90,8 +108,14 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 2,
     date: "1 Apr 2025",
     status: "signed",
+    documentStatus: "Issued",
     parentIds: ["subcontract-agreement"],
     column: 3,
+    accessControl: "restricted",
+    visibleTo: ["Hughes Bros Construction", "Apex Homes Ltd"],
+    isDisputed: true,
+    disputedBy: "Apex Homes Ltd",
+    disputeDate: "10 Apr 2025",
   },
   {
     id: "pay-less-notice-tree",
@@ -100,9 +124,13 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 2,
     date: "10 Apr 2025",
     status: "verified",
+    documentStatus: "Signed",
     isDisputed: true,
+    disputedBy: "Hughes Bros Construction",
+    disputeDate: "12 Apr 2025",
     parentIds: ["payment-app-4"],
     column: 4,
+    accessControl: "public",
   },
   // BRANCH B.1 — RM Groundworks (track 3)
   {
@@ -112,8 +140,11 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 3,
     date: "5 Feb 2025",
     status: "signed",
+    documentStatus: "Signed",
     parentIds: ["subcontract-agreement"],
     column: 2,
+    accessControl: "restricted",
+    visibleTo: ["Hughes Bros Construction", "RM Groundworks Ltd"],
   },
   {
     id: "variation-request-1",
@@ -122,8 +153,11 @@ export const branchingNodes: TreeNode[] = [
     partyTrack: 3,
     date: "22 Mar 2025",
     status: "pending",
+    documentStatus: "Issued",
     parentIds: ["site-commencement"],
     column: 3,
+    accessControl: "restricted",
+    visibleTo: ["Hughes Bros Construction", "RM Groundworks Ltd"],
   },
   // CONVERGENCE — Column 5 (shared milestone)
   {
@@ -137,5 +171,6 @@ export const branchingNodes: TreeNode[] = [
     isMilestone: true,
     blockingNote: "Requires: Change Order #3 (pending) + Payment Application #4 (complete)",
     column: 5,
+    accessControl: "public",
   },
 ];
