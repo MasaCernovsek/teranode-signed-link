@@ -386,6 +386,9 @@ const ProjectView = () => {
                         {transfer.reason && (
                           <p className="text-xs text-destructive mt-0.5">Reason: {transfer.reason}</p>
                         )}
+                        {transfer.resultingState && (
+                          <p className="text-xs text-muted-foreground mt-0.5 italic">{transfer.resultingState}</p>
+                        )}
                         <div className="flex items-center gap-1 mt-1">
                           <span className="text-xs text-muted-foreground">{transfer.date}</span>
                           {transfer.verified && (
