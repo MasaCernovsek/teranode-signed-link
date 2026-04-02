@@ -1,5 +1,7 @@
 // Branching timeline data for the document tree view
 
+export type LifecycleStatus = "Draft" | "Issued" | "Acknowledged" | "Signed" | "Superseded";
+
 export interface TreeNode {
   id: string;
   name: string;
@@ -7,8 +9,7 @@ export interface TreeNode {
   partyTrack: number; // 0 = shared, 1 = Apex, 2 = Hughes, 3 = RM Groundworks
   date: string;
   time?: string;
-  status: "verified" | "signed" | "pending" | "disputed" | "future";
-  documentStatus?: "Issued" | "Acknowledged" | "Signed";
+  lifecycleStatus: LifecycleStatus;
   parentIds: string[]; // supports convergence (multiple parents)
   isMilestone?: boolean;
   isDisputed?: boolean;
@@ -18,6 +19,7 @@ export interface TreeNode {
   column: number; // horizontal position (left to right, 0-based)
   accessControl?: "public" | "restricted";
   visibleTo?: string[];
+  supersededBy?: string; // name of the newer document that supersedes this one
 }
 
 export interface PartyTrack {
@@ -44,8 +46,7 @@ export const branchingNodes: TreeNode[] = [
     party: "All Parties",
     partyTrack: 0,
     date: "20 Jan 2025",
-    status: "verified",
-    documentStatus: "Signed",
+    lifecycleStatus: "Signed",
     parentIds: [],
     column: 0,
     accessControl: "public",
@@ -57,8 +58,7 @@ export const branchingNodes: TreeNode[] = [
     party: "Apex Homes Ltd",
     partyTrack: 1,
     date: "14 Feb 2025",
-    status: "signed",
-    documentStatus: "Signed",
+    lifecycleStatus: "Signed",
     parentIds: ["master-contract"],
     column: 1,
     accessControl: "public",
@@ -69,8 +69,7 @@ export const branchingNodes: TreeNode[] = [
     party: "Apex Homes Ltd",
     partyTrack: 1,
     date: "20 Feb 2025",
-    status: "signed",
-    documentStatus: "Acknowledged",
+    lifecycleStatus: "Acknowledged",
     parentIds: ["amendment-sow"],
     column: 2,
     accessControl: "public",
@@ -81,11 +80,23 @@ export const branchingNodes: TreeNode[] = [
     party: "Apex Homes Ltd",
     partyTrack: 1,
     date: "10 Mar 2025",
-    status: "pending",
-    documentStatus: "Issued",
+    lifecycleStatus: "Issued",
     parentIds: ["revised-payment-schedule"],
     column: 3,
     accessControl: "public",
+  },
+  // Superseded example — old version of Change Order #3
+  {
+    id: "change-order-3-v1",
+    name: "Change Order #3 (v1)",
+    party: "Apex Homes Ltd",
+    partyTrack: 1,
+    date: "8 Mar 2025",
+    lifecycleStatus: "Superseded",
+    parentIds: ["revised-payment-schedule"],
+    column: 3,
+    accessControl: "public",
+    supersededBy: "Change Order #3",
   },
   // BRANCH B — Hughes Bros (track 2)
   {
@@ -94,8 +105,7 @@ export const branchingNodes: TreeNode[] = [
     party: "Hughes Bros Construction",
     partyTrack: 2,
     date: "3 Feb 2025",
-    status: "verified",
-    documentStatus: "Signed",
+    lifecycleStatus: "Signed",
     parentIds: ["master-contract"],
     column: 1,
     accessControl: "restricted",
@@ -107,8 +117,7 @@ export const branchingNodes: TreeNode[] = [
     party: "Hughes Bros Construction",
     partyTrack: 2,
     date: "1 Apr 2025",
-    status: "signed",
-    documentStatus: "Issued",
+    lifecycleStatus: "Issued",
     parentIds: ["subcontract-agreement"],
     column: 3,
     accessControl: "restricted",
@@ -123,8 +132,7 @@ export const branchingNodes: TreeNode[] = [
     party: "Apex Homes → Hughes Bros",
     partyTrack: 2,
     date: "10 Apr 2025",
-    status: "verified",
-    documentStatus: "Signed",
+    lifecycleStatus: "Signed",
     isDisputed: true,
     disputedBy: "Hughes Bros Construction",
     disputeDate: "12 Apr 2025",
@@ -139,8 +147,7 @@ export const branchingNodes: TreeNode[] = [
     party: "RM Groundworks Ltd",
     partyTrack: 3,
     date: "5 Feb 2025",
-    status: "signed",
-    documentStatus: "Signed",
+    lifecycleStatus: "Signed",
     parentIds: ["subcontract-agreement"],
     column: 2,
     accessControl: "restricted",
@@ -152,8 +159,7 @@ export const branchingNodes: TreeNode[] = [
     party: "RM Groundworks Ltd",
     partyTrack: 3,
     date: "22 Mar 2025",
-    status: "pending",
-    documentStatus: "Issued",
+    lifecycleStatus: "Issued",
     parentIds: ["site-commencement"],
     column: 3,
     accessControl: "restricted",
@@ -166,7 +172,7 @@ export const branchingNodes: TreeNode[] = [
     party: "All Parties",
     partyTrack: 0,
     date: "Not Yet Issued",
-    status: "future",
+    lifecycleStatus: "Draft",
     parentIds: ["change-order-3", "pay-less-notice-tree"],
     isMilestone: true,
     blockingNote: "Requires: Change Order #3 (pending) + Payment Application #4 (complete)",

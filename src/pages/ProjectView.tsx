@@ -386,6 +386,9 @@ const ProjectView = () => {
                         {transfer.reason && (
                           <p className="text-xs text-destructive mt-0.5">Reason: {transfer.reason}</p>
                         )}
+                        {transfer.resultingState && (
+                          <p className="text-xs text-muted-foreground mt-0.5 italic">{transfer.resultingState}</p>
+                        )}
                         <div className="flex items-center gap-1 mt-1">
                           <span className="text-xs text-muted-foreground">{transfer.date}</span>
                           {transfer.verified && (
@@ -605,11 +608,8 @@ const ProjectView = () => {
                                       {env.name.split("—")[0].trim()}
                                       <span className="text-xs ml-1.5 text-muted-foreground/70">— Restricted Access</span>
                                     </p>
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                      Visible to: {uniqueVisible.length <= 2
-                                        ? uniqueVisible.join(" and ")
-                                        : `${uniqueVisible.slice(0, 2).join(", ")} + ${uniqueVisible.length - 2} more`
-                                      }
+                                    <p className="text-xs text-muted-foreground mt-0.5 leading-tight whitespace-normal">
+                                      Visible to: {uniqueVisible.join(", ")}
                                     </p>
                                   </div>
                                 ) : (
@@ -633,30 +633,28 @@ const ProjectView = () => {
                               </Tooltip>
                             </div>
 
-                            <div className="flex items-center gap-3 mb-1.5">
-                              <Badge
-                                variant="outline"
-                                className={cn(
-                                  "text-xs px-1.5 py-0 font-medium",
-                                  env.status === "Completed"
-                                    ? "border-accent/30 text-accent bg-accent/5"
-                                    : env.status === "In Progress"
-                                      ? "border-warning/30 text-warning bg-warning/5"
-                                      : "border-muted-foreground/30 text-muted-foreground"
-                                )}
-                              >
-                                {env.status}
-                              </Badge>
-                              {/* Document status badges */}
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              {/* Primary lifecycle status */}
                               {env.documents.map(d => d.documentStatus && (
                                 <Badge
-                                  key={d.id}
+                                  key={d.id + "-lc"}
                                   variant="outline"
                                   className={cn("text-xs px-1.5 py-0 font-medium", docStatusConfig[d.documentStatus]?.cls)}
                                 >
                                   {d.documentStatus}
                                 </Badge>
                               ))}
+                              {/* Dispute badges — separate layer */}
+                              {disputedDocs.map(d => {
+                                const disputeLabel = d.documentStatus === "Issued" ? "Challenged after issue"
+                                  : d.documentStatus === undefined || d.documentStatus === "Acknowledged" ? "Under review"
+                                  : "Disputed";
+                                return (
+                                  <Badge key={d.id + "-disp"} variant="outline" className="text-xs border-destructive/30 text-destructive bg-destructive/5 px-1.5 py-0">
+                                    {disputeLabel}
+                                  </Badge>
+                                );
+                              })}
                               {env.status === "In Progress" && (
                                 <div className="flex items-center gap-2 flex-1">
                                   <Progress value={progressPct} className="h-1.5 flex-1 max-w-24" />
@@ -667,17 +665,21 @@ const ProjectView = () => {
                               )}
                             </div>
 
-                            {/* Disputed documents */}
+                            {/* Disputed context lines */}
                             {disputedDocs.map(d => (
-                              <div key={d.id} className="flex items-center gap-1.5 mb-1">
-                                <Badge variant="outline" className="text-xs border-destructive/30 text-destructive bg-destructive/5 px-1.5 py-0">
-                                  Disputed
-                                </Badge>
+                              <div key={d.id + "-ctx"} className="flex items-center gap-1.5 mb-1">
                                 <span className="text-xs text-destructive">
                                   Contested by {d.disputedBy} on {d.disputeDate}
                                 </span>
                               </div>
                             ))}
+
+                            {/* Visible to — full wrapping text */}
+                            {isRestricted && uniqueVisible.length > 0 && (
+                              <p className="text-xs text-muted-foreground leading-tight whitespace-normal mb-1">
+                                Visible to: {uniqueVisible.join(", ")}
+                              </p>
+                            )}
 
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className={cn(
