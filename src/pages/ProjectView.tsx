@@ -608,11 +608,8 @@ const ProjectView = () => {
                                       {env.name.split("—")[0].trim()}
                                       <span className="text-xs ml-1.5 text-muted-foreground/70">— Restricted Access</span>
                                     </p>
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                      Visible to: {uniqueVisible.length <= 2
-                                        ? uniqueVisible.join(" and ")
-                                        : `${uniqueVisible.slice(0, 2).join(", ")} + ${uniqueVisible.length - 2} more`
-                                      }
+                                    <p className="text-xs text-muted-foreground mt-0.5 leading-tight whitespace-normal">
+                                      Visible to: {uniqueVisible.join(", ")}
                                     </p>
                                   </div>
                                 ) : (
