@@ -48,6 +48,7 @@ export interface OwnershipTransfer {
   verified: boolean;
   transferType?: ControlTransferType;
   reason?: string; // e.g. "Termination / Insolvency"
+  resultingState?: string; // describes state after control withdrawn
 }
 
 export interface Project {
