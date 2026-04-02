@@ -546,7 +546,7 @@ const ProjectView = () => {
             </CardHeader>
             <CardContent>
               {viewMode === "branch" ? (
-                <BranchingTimeline projectId={project.id} />
+                <BranchingTimeline projectId={project.id} userRole={currentUserRole} />
               ) : project.envelopes.length === 0 ? (
                 /* Empty state */
                 <div className="py-12 text-center">

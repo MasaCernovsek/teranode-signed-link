@@ -1,15 +1,16 @@
 import { useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { branchingNodes, partyTracks, TreeNode, LifecycleStatus } from "@/data/branchingData";
 import { ZoomIn, ZoomOut, RotateCcw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DocumentDetailModal from "@/components/DocumentDetailModal";
 
 interface BranchingTimelineProps {
   projectId: string;
+  userRole?: string;
 }
 
-const NODE_W = 210;
-const BASE_NODE_H = 68;
+const NODE_W = 200;
+const NODE_H = 72; // fixed compact height: title + party + date + badge row
 const COL_GAP = 80;
 const ROW_GAP = 40;
 const TRACK_LABEL_W = 180;
@@ -18,7 +19,6 @@ const PADDING_RIGHT = 100;
 
 const trackColors = ["#8E9196", "#2150B5", "#E8930C", "#22A55D"];
 
-// Lifecycle badge config
 const lifecycleConfig: Record<LifecycleStatus, { bg: string; fg: string }> = {
   Draft: { bg: "#F3F4F6", fg: "#6B7280" },
   Issued: { bg: "#DBEAFE", fg: "#2563EB" },
@@ -27,32 +27,21 @@ const lifecycleConfig: Record<LifecycleStatus, { bg: string; fg: string }> = {
   Superseded: { bg: "#E5E7EB", fg: "#9CA3AF" },
 };
 
-// Calculate dynamic node height based on content
-function getNodeHeight(node: TreeNode): number {
-  let h = BASE_NODE_H; // name + party + date + lifecycle badge row
-  if (node.isDisputed) h += 12; // dispute badge
-  if (node.isDisputed && node.disputedBy) h += 11; // dispute context
-  if (node.supersededBy) h += 11; // superseded label
-  if (node.accessControl === "restricted" && node.visibleTo) {
-    // Estimate lines for visible-to text
-    const text = "Visible to: " + node.visibleTo.join(", ");
-    const lines = Math.ceil(text.length / 32);
-    h += lines * 11 + 2;
-  }
-  return h;
+function getDisputeLabel(node: TreeNode): string {
+  if (node.lifecycleStatus === "Draft") return "Under review";
+  if (node.lifecycleStatus === "Issued") return "Challenged after issue";
+  return "Disputed";
 }
 
-const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
-  const navigate = useNavigate();
+const BranchingTimeline = ({ projectId, userRole }: BranchingTimelineProps) => {
   const [zoom, setZoom] = useState(1);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Filter out superseded nodes from normal flow — render them offset
   const mainNodes = branchingNodes.filter(n => n.lifecycleStatus !== "Superseded");
   const supersededNodes = branchingNodes.filter(n => n.lifecycleStatus === "Superseded");
 
-  // Determine which tracks have nodes
   const activeTracks = new Set(mainNodes.map((n) => n.partyTrack));
   const activePartyTracks = partyTracks.filter((t) => activeTracks.has(t.trackIndex));
 
@@ -61,20 +50,11 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
     trackPositionMap.set(track.trackIndex, i);
   });
 
-  // Use max node height per track for row positioning
-  const trackMaxH = new Map<number, number>();
-  branchingNodes.forEach(n => {
-    const h = getNodeHeight(n);
-    const mapped = trackPositionMap.get(n.partyTrack) ?? n.partyTrack;
-    trackMaxH.set(mapped, Math.max(trackMaxH.get(mapped) ?? BASE_NODE_H, h));
-  });
-
-  // Cumulative Y positions per track
   const trackY = new Map<number, number>();
   let cumY = PADDING_TOP;
   for (let i = 0; i < activePartyTracks.length; i++) {
     trackY.set(i, cumY);
-    cumY += (trackMaxH.get(i) ?? BASE_NODE_H) + ROW_GAP;
+    cumY += NODE_H + ROW_GAP;
   }
 
   function getRemappedNodePos(node: TreeNode) {
@@ -87,8 +67,7 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
   function getTrackCenterY(trackIndex: number) {
     const mapped = trackPositionMap.get(trackIndex) ?? trackIndex;
     const y = trackY.get(mapped) ?? PADDING_TOP;
-    const h = trackMaxH.get(mapped) ?? BASE_NODE_H;
-    return y + h / 2;
+    return y + NODE_H / 2;
   }
 
   const maxCol = Math.max(...branchingNodes.map((n) => n.column));
@@ -123,40 +102,41 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
   const handleZoomOut = () => setZoom((z) => Math.max(z - 0.15, 0.4));
   const handleZoomReset = () => setZoom(1);
 
-  // Context-aware dispute label
-  function getDisputeLabel(node: TreeNode): string {
-    if (node.lifecycleStatus === "Draft") return "Under review";
-    if (node.lifecycleStatus === "Issued") return "Challenged after issue";
-    return "Disputed";
-  }
-
   function renderNode(node: TreeNode, isSuperSeded = false) {
     const pos = getRemappedNodePos(node);
-    const nodeH = getNodeHeight(node);
     const trackColor = trackColors[node.partyTrack];
     const isHovered = hoveredNode === node.id;
     const isDimmed = hoveredNode && !connectedIds.has(node.id);
     const lcCfg = lifecycleConfig[node.lifecycleStatus];
     const isSuperseded = node.lifecycleStatus === "Superseded";
-
-    // Offset superseded nodes slightly below
     const offsetY = isSuperSeded ? 12 : 0;
 
-    let cursorY = 16; // starting y for first text line
+    const titleMaxLen = 26;
+    const partyMaxLen = 28;
+    const title = node.name.length > titleMaxLen ? node.name.slice(0, titleMaxLen - 1) + "…" : node.name;
+    const party = node.party.length > partyMaxLen ? node.party.slice(0, partyMaxLen - 1) + "…" : node.party;
+
+    const lcLabel = node.lifecycleStatus;
+    const lcBadgeW = lcLabel.length * 6.5 + 12;
+
+    // Dispute badge
+    const hasDispute = node.isDisputed;
+    const disputeLabel = hasDispute ? getDisputeLabel(node) : "";
+    const disputeBadgeW = hasDispute ? disputeLabel.length * 5.5 + 12 : 0;
+    const disputeX = 10 + lcBadgeW + 4;
 
     return (
       <g
         key={node.id}
         transform={`translate(${pos.x}, ${pos.y + offsetY})`}
-        onClick={() => navigate(`/project/${projectId}/document/${node.id}`)}
+        onClick={(e) => { e.stopPropagation(); setSelectedNode(node); }}
         onMouseEnter={() => setHoveredNode(node.id)}
         onMouseLeave={() => setHoveredNode(null)}
         className="cursor-pointer"
         opacity={isDimmed ? 0.2 : isSuperseded ? 0.45 : 1}
       >
-        {/* Card background */}
         <rect
-          x={0} y={0} width={NODE_W} height={nodeH}
+          x={0} y={0} width={NODE_W} height={NODE_H}
           rx={node.isMilestone ? 12 : 8}
           fill="white"
           stroke={node.isDisputed ? "#EF4444" : isSuperseded ? "#D1D5DB" : node.lifecycleStatus === "Draft" ? "#8E9196" : trackColor}
@@ -166,7 +146,7 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
         />
         {node.isMilestone && (
           <rect
-            x={-3} y={-3} width={NODE_W + 6} height={nodeH + 6}
+            x={-3} y={-3} width={NODE_W + 6} height={NODE_H + 6}
             rx={14} fill="none"
             stroke={node.lifecycleStatus === "Draft" ? "#8E9196" : trackColor}
             strokeWidth={1} strokeDasharray="6 3" opacity={0.4}
@@ -174,107 +154,39 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
         )}
         {node.isDisputed && (
           <rect
-            x={-2} y={-2} width={NODE_W + 4} height={nodeH + 4}
+            x={-2} y={-2} width={NODE_W + 4} height={NODE_H + 4}
             rx={10} fill="none" stroke="#EF4444" strokeWidth={1} opacity={0.3}
           />
         )}
 
-        {/* Name */}
-        <text x={10} y={cursorY} fontSize={12} fontWeight={600} fill={isSuperseded ? "#9CA3AF" : "#1a1a2e"} fontFamily="Inter, sans-serif">
-          {node.name.length > 24 ? node.name.slice(0, 22) + "…" : node.name}
+        {/* Title */}
+        <text x={10} y={16} fontSize={12} fontWeight={600} fill={isSuperseded ? "#9CA3AF" : "#1a1a2e"} fontFamily="Inter, sans-serif">
+          {title}
         </text>
         {/* Party */}
-        <text x={10} y={cursorY + 13} fontSize={12} fill={isSuperseded ? "#9CA3AF" : trackColor} fontFamily="Inter, sans-serif" fontWeight={500}>
-          {node.party.length > 28 ? node.party.slice(0, 26) + "…" : node.party}
+        <text x={10} y={29} fontSize={11} fill={isSuperseded ? "#9CA3AF" : trackColor} fontFamily="Inter, sans-serif" fontWeight={500}>
+          {party}
         </text>
         {/* Date */}
-        <text x={10} y={cursorY + 25} fontSize={12} fill="#8E9196" fontFamily="Inter, sans-serif">
+        <text x={10} y={41} fontSize={11} fill="#8E9196" fontFamily="Inter, sans-serif">
           {node.date}
         </text>
 
-        {/* Lifecycle status badge — always primary */}
-        {(() => {
-          const badgeY = cursorY + 32;
-          const label = node.lifecycleStatus;
-          const badgeW = label.length * 6.5 + 12;
-          return (
-            <>
-              <rect x={10} y={badgeY} width={badgeW} height={16} rx={3} fill={lcCfg.bg} />
-              <text x={14} y={badgeY + 11} fontSize={12} fontWeight={600} fill={lcCfg.fg} fontFamily="Inter, sans-serif">
-                {label}
-              </text>
-            </>
-          );
-        })()}
+        {/* Lifecycle badge */}
+        <rect x={10} y={48} width={lcBadgeW} height={16} rx={3} fill={lcCfg.bg} />
+        <text x={14} y={59} fontSize={10} fontWeight={600} fill={lcCfg.fg} fontFamily="Inter, sans-serif">
+          {lcLabel}
+        </text>
 
-        {/* Dispute badge — separate from lifecycle */}
-        {node.isDisputed && (() => {
-          const badgeY = cursorY + 32;
-          const lcLabel = node.lifecycleStatus;
-          const lcW = lcLabel.length * 6.5 + 12;
-          const disputeLabel = getDisputeLabel(node);
-          const disputeW = disputeLabel.length * 6 + 12;
-          const disputeX = 10 + lcW + 6;
-          return (
-            <>
-              <rect x={disputeX} y={badgeY} width={disputeW} height={16} rx={3} fill="#FEE2E2" />
-              <text x={disputeX + 4} y={badgeY + 11} fontSize={12} fontWeight={600} fill="#EF4444" fontFamily="Inter, sans-serif">
-                {disputeLabel}
-              </text>
-            </>
-          );
-        })()}
-
-        {/* Disputed context line */}
-        {node.isDisputed && node.disputedBy && (
-          <text x={10} y={cursorY + 60} fontSize={12} fill="#EF4444" fontFamily="Inter, sans-serif">
-            {node.disputedBy} · {node.disputeDate}
-          </text>
-        )}
-
-        {/* Superseded label */}
-        {node.supersededBy && (
-          <text
-            x={10}
-            y={cursorY + (node.isDisputed && node.disputedBy ? 72 : 60)}
-            fontSize={12} fill="#9CA3AF" fontFamily="Inter, sans-serif" fontStyle="italic"
-          >
-            Superseded by {node.supersededBy}
-          </text>
-        )}
-
-        {/* Restricted access — full-width wrapping text */}
-        {node.accessControl === "restricted" && node.visibleTo && (() => {
-          const baseY = cursorY + (node.isDisputed && node.disputedBy ? 72 : node.isDisputed ? 60 : node.supersededBy ? 72 : 52);
-          const fullText = "Visible to: " + node.visibleTo.join(", ");
-          // Simple line-breaking for SVG
-          const maxChars = 32;
-          const lines: string[] = [];
-          let remaining = fullText;
-          while (remaining.length > 0) {
-            if (remaining.length <= maxChars) {
-              lines.push(remaining);
-              break;
-            }
-            let breakAt = remaining.lastIndexOf(", ", maxChars);
-            if (breakAt === -1 || breakAt < 10) breakAt = maxChars;
-            else breakAt += 2;
-            lines.push(remaining.slice(0, breakAt));
-            remaining = remaining.slice(breakAt);
-          }
-          return lines.map((line, li) => (
-            <text
-              key={li}
-              x={10}
-              y={baseY + li * 12}
-              fontSize={12}
-              fill="#8E9196"
-              fontFamily="Inter, sans-serif"
-            >
-              {line}
+        {/* Dispute badge */}
+        {hasDispute && (
+          <>
+            <rect x={disputeX} y={48} width={disputeBadgeW} height={16} rx={3} fill="#FEE2E2" />
+            <text x={disputeX + 4} y={59} fontSize={10} fontWeight={600} fill="#EF4444" fontFamily="Inter, sans-serif">
+              {disputeLabel}
             </text>
-          ));
-        })()}
+          </>
+        )}
       </g>
     );
   }
@@ -306,29 +218,17 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
           viewBox={`0 0 ${svgW} ${svgH}`}
           className="select-none"
         >
-          {/* Track labels — only active tracks */}
           {activePartyTracks.map((track) => {
             const y = getTrackCenterY(track.trackIndex);
             return (
               <g key={track.trackIndex}>
                 <line
-                  x1={TRACK_LABEL_W - 10}
-                  y1={y}
-                  x2={svgW - 20}
-                  y2={y}
-                  stroke={track.colorHex}
-                  strokeWidth={1}
-                  strokeDasharray="4 4"
-                  opacity={0.2}
+                  x1={TRACK_LABEL_W - 10} y1={y} x2={svgW - 20} y2={y}
+                  stroke={track.colorHex} strokeWidth={1} strokeDasharray="4 4" opacity={0.2}
                 />
                 <text
-                  x={10}
-                  y={y}
-                  dominantBaseline="middle"
-                  fill={track.colorHex}
-                  fontSize={12}
-                  fontWeight={600}
-                  fontFamily="Inter, sans-serif"
+                  x={10} y={y} dominantBaseline="middle"
+                  fill={track.colorHex} fontSize={12} fontWeight={600} fontFamily="Inter, sans-serif"
                 >
                   {track.trackIndex === 0 ? "Shared" : track.name}
                 </text>
@@ -336,17 +236,13 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
             );
           })}
 
-          {/* Edges */}
           {edges.map(({ from, to }, i) => {
             const fromPos = getRemappedNodePos(from);
             const toPos = getRemappedNodePos(to);
-            const fromH = getNodeHeight(from);
-            const toH = getNodeHeight(to);
             const x1 = fromPos.x + NODE_W;
-            const y1 = fromPos.y + fromH / 2;
+            const y1 = fromPos.y + NODE_H / 2;
             const x2 = toPos.x;
-            const y2 = toPos.y + toH / 2;
-
+            const y2 = toPos.y + NODE_H / 2;
             const isHighlighted = hoveredNode && connectedIds.has(from.id) && connectedIds.has(to.id);
             const edgeColor = trackColors[to.partyTrack] || "#8E9196";
             const isCrossingTracks = from.partyTrack !== to.partyTrack;
@@ -375,15 +271,11 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
             );
           })}
 
-          {/* Main nodes */}
           {mainNodes.map((node) => renderNode(node))}
-
-          {/* Superseded nodes — muted, offset */}
           {supersededNodes.map((node) => renderNode(node, true))}
         </svg>
       </div>
 
-      {/* Blocking note for milestone */}
       {branchingNodes.filter(n => n.blockingNote).map(node => (
         <div key={node.id} className="mt-2 px-3 py-2 rounded-md bg-warning/5 border border-warning/20">
           <p className="text-xs text-warning font-medium flex items-center gap-1.5">
@@ -392,6 +284,13 @@ const BranchingTimeline = ({ projectId }: BranchingTimelineProps) => {
           </p>
         </div>
       ))}
+
+      <DocumentDetailModal
+        node={selectedNode}
+        open={!!selectedNode}
+        onOpenChange={(open) => { if (!open) setSelectedNode(null); }}
+        userRole={userRole}
+      />
     </div>
   );
 };
