@@ -25,8 +25,14 @@ import {
   Download,
   CheckCircle2,
   ArrowRight,
-  ChevronDown,
+  Lock,
 } from "lucide-react";
+
+import landingVerifyChain from "@/assets/landing-verify-chain.png";
+import landingAddRecipients from "@/assets/landing-add-recipients.png";
+import landingActionDates from "@/assets/landing-action-dates.png";
+import landingPinSecurity from "@/assets/landing-pin-security.png";
+import landingTags from "@/assets/landing-tags.png";
 
 const EarlyAccess = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -47,6 +53,45 @@ const EarlyAccess = () => {
   const scrollToSignup = () => {
     document.getElementById("signup")?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const liveFeatures = [
+    {
+      icon: FileText,
+      title: "Upload and request signatures",
+      desc: "Send PDF or Word contracts, notices, and approvals for signature with a clear audit of who signed and when.",
+      image: landingAddRecipients,
+      imageAlt: "Add recipients and assign signing roles in Teranode Sign",
+      hero: true,
+    },
+    {
+      icon: Link2,
+      title: "Blockchain-backed timestamps",
+      desc: "Every signed document is anchored to the blockchain, creating an independent, tamper-proof record of when it was executed.",
+      image: landingVerifyChain,
+      imageAlt: "Verify document signature on blockchain",
+    },
+    {
+      icon: Tag,
+      title: "Tags and document organisation",
+      desc: "Organise documents by project, counterparty, and type. Find what you need without digging through email.",
+      image: landingTags,
+      imageAlt: "Organise envelopes with custom tags",
+    },
+    {
+      icon: Bell,
+      title: "Action dates and reminders",
+      desc: "Set reminders for expirations, renewals, and important project milestones so nothing falls through the cracks.",
+      image: landingActionDates,
+      imageAlt: "Set action dates during envelope setup",
+    },
+    {
+      icon: Lock,
+      title: "PIN-protected document access",
+      desc: "Add an extra layer of security by requiring a one-time PIN for recipients to access sensitive documents.",
+      image: landingPinSecurity,
+      imageAlt: "Require PIN for secure document access",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -116,50 +161,76 @@ const EarlyAccess = () => {
       {/* What's live */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold tracking-tight mb-4 text-center">
+          <p className="text-xs font-medium uppercase tracking-wider text-primary mb-3">
+            Available in the app today
+          </p>
+          <h2 className="text-3xl font-bold tracking-tight mb-4">
             What's live and ready now
           </h2>
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-10">
+          <p className="text-muted-foreground max-w-2xl mb-12">
             Teranode Sign is a real product, not a waitlist. Teams can sign up
             and start using it immediately to manage, sign, and timestamp
             construction documents.
           </p>
-          <div className="grid md:grid-cols-2 gap-5 mb-8">
-            {[
-              {
-                icon: FileText,
-                title: "Upload and request signatures",
-                desc: "Send PDF or Word contracts, notices, and approvals for signature with a clear audit of who signed and when.",
-              },
-              {
-                icon: Link2,
-                title: "Blockchain-backed timestamps",
-                desc: "Every signed document is anchored to the blockchain, creating an independent, tamper-proof record of when it was executed.",
-              },
-              {
-                icon: Tag,
-                title: "Tags and document organisation",
-                desc: "Organise documents by project, counterparty, and type. Find what you need without digging through email.",
-              },
-              {
-                icon: Bell,
-                title: "Action dates and reminders",
-                desc: "Set reminders for expirations, renewals, and important project milestones so nothing falls through the cracks.",
-              },
-            ].map(({ icon: Icon, title, desc }) => (
-              <Card key={title} className="border border-border">
-                <CardContent className="p-6 flex gap-4">
-                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Icon className="h-4 w-4 text-primary" />
+
+          {/* Hero feature card — Add Recipients */}
+          <Card className="border border-border mb-8 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="grid md:grid-cols-2">
+                <div className="p-8 flex flex-col justify-center">
+                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                    <FileText className="h-4 w-4 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                  <h3 className="text-lg font-semibold mb-2">{liveFeatures[0].title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {liveFeatures[0].desc}
+                  </p>
+                </div>
+                <div className="bg-muted/30 p-6 flex items-center justify-center">
+                  <div className="rounded-lg border border-border shadow-sm overflow-hidden max-w-sm">
+                    <img
+                      src={liveFeatures[0].image}
+                      alt={liveFeatures[0].imageAlt}
+                      className="w-full h-auto"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Supporting feature cards — 2x2 grid */}
+          <div className="grid sm:grid-cols-2 gap-5 mb-8">
+            {liveFeatures.slice(1).map(({ icon: Icon, title, desc, image, imageAlt }) => (
+              <Card key={title} className="border border-border overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="bg-muted/30 p-4 flex items-center justify-center border-b border-border">
+                    <div className="rounded-lg border border-border shadow-sm overflow-hidden max-w-[240px]">
+                      <img
+                        src={image}
+                        alt={imageAlt}
+                        className="w-full h-auto"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <Icon className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-sm mb-1">{title}</h3>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+
           <p className="text-center text-sm font-semibold text-primary">
             This is not a mockup — the app is already running and usable today.
           </p>
@@ -182,34 +253,121 @@ const EarlyAccess = () => {
             designed for the way construction documentation actually works: messy,
             multi-party, and time-critical.
           </p>
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              {
-                icon: GitBranch,
-                title: "Contract Timeline",
-                desc: "A branching timeline of project documents and downstream relationships — not a flat list, but a tree that reflects how construction contracts actually flow.",
-              },
-              {
-                icon: AlertTriangle,
-                title: "Dispute Mode",
-                desc: "Surface contested documents, preserve history, and keep evidence intact. Built for adjudication, not just filing.",
-              },
-              {
-                icon: Download,
-                title: "One-click evidence export",
-                desc: "Assemble a dispute bundle with full audit trail and blockchain verification — ready for adjudicators, lawyers, or mediators.",
-              },
-            ].map(({ icon: Icon, title, desc }) => (
-              <Card key={title} className="border border-border">
-                <CardContent className="p-6">
+
+          {/* Branching timeline — hero visual for future section */}
+          <Card className="border border-border mb-6 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="grid md:grid-cols-5">
+                <div className="md:col-span-2 p-8 flex flex-col justify-center">
                   <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <Icon className="h-4 w-4 text-primary" />
+                    <GitBranch className="h-4 w-4 text-primary" />
                   </div>
-                  <h3 className="font-semibold mb-2">{title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                </CardContent>
-              </Card>
-            ))}
+                  <h3 className="text-lg font-semibold mb-2">Contract Timeline</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    A branching timeline of project documents and downstream
+                    relationships — not a flat list, but a tree that reflects how
+                    construction contracts actually flow.
+                  </p>
+                </div>
+                <div className="md:col-span-3 bg-muted/40 p-6 flex items-center justify-center border-l border-border">
+                  {/* SVG product concept — branching timeline */}
+                  <svg viewBox="0 0 480 200" className="w-full max-w-md" aria-label="Branching contract timeline concept">
+                    {/* Track lines */}
+                    <line x1="60" y1="60" x2="420" y2="60" className="stroke-[hsl(var(--primary))]" strokeWidth="2" strokeDasharray="4 2" opacity="0.3" />
+                    <line x1="180" y1="60" x2="300" y2="120" className="stroke-[hsl(var(--chart-2))]" strokeWidth="2" opacity="0.4" />
+                    <line x1="180" y1="60" x2="300" y2="160" className="stroke-[hsl(var(--chart-3))]" strokeWidth="2" opacity="0.4" />
+                    <line x1="300" y1="120" x2="420" y2="60" className="stroke-[hsl(var(--chart-2))]" strokeWidth="2" strokeDasharray="4 2" opacity="0.3" />
+                    <line x1="300" y1="160" x2="420" y2="60" className="stroke-[hsl(var(--chart-3))]" strokeWidth="2" strokeDasharray="4 2" opacity="0.3" />
+
+                    {/* Nodes */}
+                    <circle cx="60" cy="60" r="12" className="fill-primary" opacity="0.9" />
+                    <text x="60" y="64" textAnchor="middle" className="fill-primary-foreground" fontSize="8" fontWeight="bold">MC</text>
+                    <text x="60" y="85" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Master</text>
+
+                    <circle cx="180" cy="60" r="12" className="fill-primary" opacity="0.9" />
+                    <text x="180" y="64" textAnchor="middle" className="fill-primary-foreground" fontSize="8" fontWeight="bold">V1</text>
+                    <text x="180" y="85" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Variation</text>
+
+                    <circle cx="300" cy="120" r="10" className="fill-[hsl(var(--chart-2))]" />
+                    <text x="300" y="124" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">SC</text>
+                    <text x="300" y="143" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Sub-contract</text>
+
+                    <circle cx="300" cy="160" r="10" className="fill-[hsl(var(--chart-3))]" />
+                    <text x="300" y="164" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">PA</text>
+                    <text x="300" y="183" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Payment App</text>
+
+                    {/* Convergence node */}
+                    <circle cx="420" cy="60" r="16" className="fill-primary" opacity="0.15" />
+                    <circle cx="420" cy="60" r="12" className="fill-primary" opacity="0.9" />
+                    <text x="420" y="64" textAnchor="middle" className="fill-primary-foreground" fontSize="7" fontWeight="bold">PC</text>
+                    <text x="420" y="85" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Completion</text>
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Dispute + Export cards */}
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Card className="border border-border overflow-hidden">
+              <CardContent className="p-0">
+                <div className="bg-muted/40 p-5 flex items-center justify-center border-b border-border min-h-[140px]">
+                  {/* SVG — disputed document state */}
+                  <svg viewBox="0 0 240 100" className="w-full max-w-[200px]" aria-label="Disputed document concept">
+                    <rect x="10" y="10" width="100" height="80" rx="6" className="fill-background stroke-destructive" strokeWidth="2" />
+                    <text x="60" y="40" textAnchor="middle" className="fill-foreground" fontSize="9" fontWeight="600">Payment App #4</text>
+                    <rect x="30" y="52" width="60" height="16" rx="3" className="fill-destructive" opacity="0.15" />
+                    <text x="60" y="63" textAnchor="middle" className="fill-destructive" fontSize="7" fontWeight="600">Disputed</text>
+                    <rect x="130" y="20" width="100" height="60" rx="6" className="fill-background stroke-border" strokeWidth="1.5" />
+                    <text x="180" y="42" textAnchor="middle" className="fill-muted-foreground" fontSize="8">History preserved</text>
+                    <text x="180" y="56" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Evidence locked</text>
+                    <line x1="110" y1="50" x2="130" y2="50" className="stroke-destructive" strokeWidth="1.5" strokeDasharray="3 2" />
+                  </svg>
+                </div>
+                <div className="p-5">
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
+                    <AlertTriangle className="h-4 w-4 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-sm mb-1">Dispute Mode</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Surface contested documents, preserve history, and keep evidence intact. Built for adjudication, not just filing.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-border overflow-hidden">
+              <CardContent className="p-0">
+                <div className="bg-muted/40 p-5 flex items-center justify-center border-b border-border min-h-[140px]">
+                  {/* SVG — evidence export */}
+                  <svg viewBox="0 0 240 100" className="w-full max-w-[200px]" aria-label="Evidence export concept">
+                    <rect x="20" y="10" width="90" height="80" rx="6" className="fill-background stroke-border" strokeWidth="1.5" />
+                    <text x="65" y="32" textAnchor="middle" className="fill-foreground" fontSize="8" fontWeight="600">Evidence Bundle</text>
+                    <line x1="35" y1="42" x2="95" y2="42" className="stroke-border" strokeWidth="1" />
+                    <text x="65" y="55" textAnchor="middle" className="fill-muted-foreground" fontSize="7">✓ Audit trail</text>
+                    <text x="65" y="67" textAnchor="middle" className="fill-muted-foreground" fontSize="7">✓ Blockchain proof</text>
+                    <text x="65" y="79" textAnchor="middle" className="fill-muted-foreground" fontSize="7">✓ Chain of custody</text>
+                    <rect x="140" y="30" width="80" height="40" rx="6" className="fill-primary" opacity="0.9" />
+                    <text x="180" y="54" textAnchor="middle" className="fill-primary-foreground" fontSize="9" fontWeight="600">Export PDF</text>
+                    <path d="M 110 50 L 140 50" className="stroke-primary" strokeWidth="2" markerEnd="url(#arrow)" />
+                    <defs>
+                      <marker id="arrow" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+                        <path d="M 0 0 L 6 3 L 0 6 Z" className="fill-primary" />
+                      </marker>
+                    </defs>
+                  </svg>
+                </div>
+                <div className="p-5">
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
+                    <Download className="h-4 w-4 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-sm mb-1">One-click evidence export</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Assemble a dispute bundle with full audit trail and blockchain verification — ready for adjudicators, lawyers, or mediators.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
