@@ -26,13 +26,16 @@ import {
   CheckCircle2,
   ArrowRight,
   Lock,
+  ListOrdered,
 } from "lucide-react";
 
+import featureActions from "@/assets/feature-actions.svg";
+import featureSigningOrders from "@/assets/feature-signing-orders.svg";
+import featurePin from "@/assets/feature-pin.svg";
+import featureTags from "@/assets/feature-tags.svg";
+import teranodeLogo from "@/assets/teranode-logo.svg";
 import landingVerifyChain from "@/assets/landing-verify-chain.png";
 import landingAddRecipients from "@/assets/landing-add-recipients.png";
-import landingActionDates from "@/assets/landing-action-dates.png";
-import landingPinSecurity from "@/assets/landing-pin-security.png";
-import landingTags from "@/assets/landing-tags.png";
 
 const EarlyAccess = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -58,38 +61,38 @@ const EarlyAccess = () => {
     {
       icon: FileText,
       title: "Upload and request signatures",
-      desc: "Send PDF or Word contracts, notices, and approvals for signature with a clear audit of who signed and when.",
+      desc: "Send PDF or Word contracts, notices, and approvals for signature.",
       image: landingAddRecipients,
-      imageAlt: "Add recipients and assign signing roles in Teranode Sign",
-      hero: true,
     },
     {
       icon: Link2,
       title: "Blockchain-backed timestamps",
-      desc: "Every signed document is anchored to the blockchain, creating an independent, tamper-proof record of when it was executed.",
+      desc: "Anchor each signed document to an independent, tamper-proof record.",
       image: landingVerifyChain,
-      imageAlt: "Verify document signature on blockchain",
+    },
+    {
+      icon: ListOrdered,
+      title: "Custom signing flows",
+      desc: "Set sequential or custom signing orders for recipients to review and sign documents.",
+      image: featureSigningOrders,
     },
     {
       icon: Tag,
-      title: "Tags and document organisation",
-      desc: "Organise documents by project, counterparty, and type. Find what you need without digging through email.",
-      image: landingTags,
-      imageAlt: "Organise envelopes with custom tags",
+      title: "Tags and organisation",
+      desc: "Organise documents by project, counterparty, and type for faster retrieval.",
+      image: featureTags,
     },
     {
       icon: Bell,
       title: "Action dates and reminders",
-      desc: "Set reminders for expirations, renewals, and important project milestones so nothing falls through the cracks.",
-      image: landingActionDates,
-      imageAlt: "Set action dates during envelope setup",
+      desc: "Track expirations, renewals, and key contract milestones with reminders.",
+      image: featureActions,
     },
     {
       icon: Lock,
-      title: "PIN-protected document access",
-      desc: "Add an extra layer of security by requiring a one-time PIN for recipients to access sensitive documents.",
-      image: landingPinSecurity,
-      imageAlt: "Require PIN for secure document access",
+      title: "PIN-protected access",
+      desc: "Add an extra security layer with a one-time PIN for sensitive documents.",
+      image: featurePin,
     },
   ];
 
@@ -98,9 +101,7 @@ const EarlyAccess = () => {
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-lg font-bold tracking-tight">
-            <span className="text-primary">Teranode</span> Sign
-          </span>
+          <img src={teranodeLogo} alt="Teranode" className="h-7" />
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>
               <Link to="/">Dashboard</Link>
@@ -149,17 +150,15 @@ const EarlyAccess = () => {
             { icon: Server, label: "Cloud-hosted or on-premises" },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex flex-col items-center text-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Icon className="h-5 w-5 text-primary" />
-              </div>
+              <Icon className="h-5 w-5 text-primary" />
               <span className="text-sm font-medium">{label}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* What's live */}
-      <section className="py-20 px-6">
+      {/* ── LIVE SECTION ── light background, operational feel */}
+      <section className="py-20 px-6 bg-background">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-medium uppercase tracking-wider text-primary mb-3">
             Available in the app today
@@ -173,53 +172,22 @@ const EarlyAccess = () => {
             construction documents.
           </p>
 
-          {/* Hero feature card — Add Recipients */}
-          <Card className="border border-border mb-8 overflow-hidden">
-            <CardContent className="p-0">
-              <div className="grid md:grid-cols-2">
-                <div className="p-8 flex flex-col justify-center">
-                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <FileText className="h-4 w-4 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{liveFeatures[0].title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {liveFeatures[0].desc}
-                  </p>
-                </div>
-                <div className="bg-muted/30 p-6 flex items-center justify-center">
-                  <div className="rounded-lg border border-border shadow-sm overflow-hidden max-w-sm">
+          {/* 3x2 on desktop, 2x3 tablet, 1x6 mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            {liveFeatures.map(({ icon: Icon, title, desc, image }) => (
+              <Card key={title} className="border border-border overflow-hidden bg-background">
+                <CardContent className="p-0">
+                  <div className="bg-muted/30 p-4 flex items-center justify-center border-b border-border aspect-[4/3]">
                     <img
-                      src={liveFeatures[0].image}
-                      alt={liveFeatures[0].imageAlt}
-                      className="w-full h-auto"
+                      src={image}
+                      alt={title}
+                      className="max-w-full max-h-full object-contain rounded-md"
                       loading="lazy"
                     />
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Supporting feature cards — 2x2 grid */}
-          <div className="grid sm:grid-cols-2 gap-5 mb-8">
-            {liveFeatures.slice(1).map(({ icon: Icon, title, desc, image, imageAlt }) => (
-              <Card key={title} className="border border-border overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="bg-muted/30 p-4 flex items-center justify-center border-b border-border">
-                    <div className="rounded-lg border border-border shadow-sm overflow-hidden max-w-[240px]">
-                      <img
-                        src={image}
-                        alt={imageAlt}
-                        className="w-full h-auto"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                  <div className="p-5">
+                  <div className="p-4">
                     <div className="flex items-start gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Icon className="h-4 w-4 text-primary" />
-                      </div>
+                      <Icon className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                       <div>
                         <h3 className="font-semibold text-sm mb-1">{title}</h3>
                         <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
@@ -231,143 +199,143 @@ const EarlyAccess = () => {
             ))}
           </div>
 
+          <p className="text-center text-xs text-muted-foreground mb-2">
+            Built for developers, main contractors, subcontractors, consultants, and multi-stakeholder project teams (including consortia and joint delivery teams).
+          </p>
           <p className="text-center text-sm font-semibold text-primary">
-            This is not a mockup — the app is already running and usable today.
+            The app is up and running and used by legal teams today.
           </p>
         </div>
       </section>
 
-      {/* What we're building next */}
-      <section className="py-20 px-6 bg-muted/30">
+      {/* ── FUTURE SECTION ── dark band, dramatic contrast */}
+      <section className="py-20 px-6 bg-[hsl(230,30%,12%)] text-white">
         <div className="max-w-5xl mx-auto">
-          <span className="inline-block text-xs font-medium uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full mb-6">
+          <span className="inline-block text-xs font-medium uppercase tracking-wider text-primary bg-primary/15 px-3 py-1 rounded-full mb-6">
             In development with pilot users
           </span>
-          <h2 className="text-3xl font-bold tracking-tight mb-4">
+          <h2 className="text-3xl font-bold tracking-tight mb-4 text-white">
             Built around real disputes, not just signatures.
           </h2>
-          <p className="text-muted-foreground max-w-2xl mb-10 leading-relaxed">
+          <p className="text-white/70 max-w-2xl mb-12 leading-relaxed">
             We're building Project Chain of Custody — a branching record of
             contracts, notices, payment applications, change orders, access and
-            control events, and disputes across all project parties. It's
-            designed for the way construction documentation actually works: messy,
-            multi-party, and time-critical.
+            control events, and disputes across all project parties. Designed for
+            multi-stakeholder construction projects, consortia, joint delivery
+            teams, and downstream subcontracting relationships.
           </p>
 
-          {/* Branching timeline — hero visual for future section */}
-          <Card className="border border-border mb-6 overflow-hidden">
-            <CardContent className="p-0">
-              <div className="grid md:grid-cols-5">
-                <div className="md:col-span-2 p-8 flex flex-col justify-center">
-                  <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <GitBranch className="h-4 w-4 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Contract Timeline</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    A branching timeline of project documents and downstream
-                    relationships — not a flat list, but a tree that reflects how
-                    construction contracts actually flow.
-                  </p>
-                </div>
-                <div className="md:col-span-3 bg-muted/40 p-6 flex items-center justify-center border-l border-border">
-                  {/* SVG product concept — branching timeline */}
-                  <svg viewBox="0 0 480 200" className="w-full max-w-md" aria-label="Branching contract timeline concept">
-                    {/* Track lines */}
-                    <line x1="60" y1="60" x2="420" y2="60" className="stroke-[hsl(var(--primary))]" strokeWidth="2" strokeDasharray="4 2" opacity="0.3" />
-                    <line x1="180" y1="60" x2="300" y2="120" className="stroke-[hsl(var(--chart-2))]" strokeWidth="2" opacity="0.4" />
-                    <line x1="180" y1="60" x2="300" y2="160" className="stroke-[hsl(var(--chart-3))]" strokeWidth="2" opacity="0.4" />
-                    <line x1="300" y1="120" x2="420" y2="60" className="stroke-[hsl(var(--chart-2))]" strokeWidth="2" strokeDasharray="4 2" opacity="0.3" />
-                    <line x1="300" y1="160" x2="420" y2="60" className="stroke-[hsl(var(--chart-3))]" strokeWidth="2" strokeDasharray="4 2" opacity="0.3" />
-
-                    {/* Nodes */}
-                    <circle cx="60" cy="60" r="12" className="fill-primary" opacity="0.9" />
-                    <text x="60" y="64" textAnchor="middle" className="fill-primary-foreground" fontSize="8" fontWeight="bold">MC</text>
-                    <text x="60" y="85" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Master</text>
-
-                    <circle cx="180" cy="60" r="12" className="fill-primary" opacity="0.9" />
-                    <text x="180" y="64" textAnchor="middle" className="fill-primary-foreground" fontSize="8" fontWeight="bold">V1</text>
-                    <text x="180" y="85" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Variation</text>
-
-                    <circle cx="300" cy="120" r="10" className="fill-[hsl(var(--chart-2))]" />
-                    <text x="300" y="124" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">SC</text>
-                    <text x="300" y="143" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Sub-contract</text>
-
-                    <circle cx="300" cy="160" r="10" className="fill-[hsl(var(--chart-3))]" />
-                    <text x="300" y="164" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">PA</text>
-                    <text x="300" y="183" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Payment App</text>
-
-                    {/* Convergence node */}
-                    <circle cx="420" cy="60" r="16" className="fill-primary" opacity="0.15" />
-                    <circle cx="420" cy="60" r="12" className="fill-primary" opacity="0.9" />
-                    <text x="420" y="64" textAnchor="middle" className="fill-primary-foreground" fontSize="7" fontWeight="bold">PC</text>
-                    <text x="420" y="85" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Completion</text>
-                  </svg>
-                </div>
+          {/* Project Chain of Custody — hero visual */}
+          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur mb-6 overflow-hidden">
+            <div className="grid md:grid-cols-5">
+              <div className="md:col-span-2 p-8 flex flex-col justify-center">
+                <GitBranch className="h-5 w-5 text-primary mb-4" />
+                <h3 className="text-lg font-semibold mb-2 text-white">Project Chain of Custody</h3>
+                <p className="text-sm text-white/60 leading-relaxed">
+                  A branching timeline of project documents and downstream
+                  relationships — showing how contracts, variations, sub-contracts,
+                  and payment applications flow across multiple organisations and
+                  consortia members.
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="md:col-span-3 p-6 flex items-center justify-center border-l border-white/10">
+                <svg viewBox="0 0 520 220" className="w-full max-w-lg" aria-label="Branching contract timeline concept">
+                  {/* Main track */}
+                  <line x1="50" y1="70" x2="470" y2="70" stroke="hsl(263, 100%, 31%)" strokeWidth="2" strokeDasharray="4 2" opacity="0.4" />
+                  {/* Branch lines */}
+                  <line x1="170" y1="70" x2="290" y2="130" stroke="#3b82f6" strokeWidth="2" opacity="0.5" />
+                  <line x1="170" y1="70" x2="290" y2="180" stroke="#f97316" strokeWidth="2" opacity="0.5" />
+                  <line x1="290" y1="130" x2="380" y2="130" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.3" />
+                  <line x1="380" y1="130" x2="470" y2="70" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.3" />
+                  <line x1="290" y1="180" x2="470" y2="70" stroke="#f97316" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.3" />
 
-          {/* Dispute + Export cards */}
+                  {/* Nodes */}
+                  <circle cx="50" cy="70" r="14" fill="hsl(263, 100%, 31%)" opacity="0.9" />
+                  <text x="50" y="74" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">MC</text>
+                  <text x="50" y="96" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">Master</text>
+
+                  <circle cx="170" cy="70" r="12" fill="hsl(263, 100%, 31%)" opacity="0.9" />
+                  <text x="170" y="74" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">V1</text>
+                  <text x="170" y="96" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">Variation</text>
+
+                  <circle cx="290" cy="130" r="11" fill="#3b82f6" />
+                  <text x="290" y="134" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">SC</text>
+                  <text x="290" y="152" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">Sub-contract</text>
+
+                  <circle cx="380" cy="130" r="9" fill="#3b82f6" opacity="0.7" />
+                  <text x="380" y="134" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">SC2</text>
+                  <text x="380" y="152" textAnchor="middle" fill="white" opacity="0.5" fontSize="7">Downstream</text>
+
+                  <circle cx="290" cy="180" r="11" fill="#f97316" />
+                  <text x="290" y="184" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">PA</text>
+                  <text x="290" y="200" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">Payment App</text>
+
+                  {/* Convergence */}
+                  <circle cx="470" cy="70" r="20" fill="hsl(263, 100%, 31%)" opacity="0.15" />
+                  <circle cx="470" cy="70" r="14" fill="hsl(263, 100%, 31%)" opacity="0.9" />
+                  <text x="470" y="74" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">PC</text>
+                  <text x="470" y="96" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">Completion</text>
+
+                  {/* Org labels */}
+                  <text x="50" y="22" textAnchor="middle" fill="white" opacity="0.35" fontSize="7">Apex Homes</text>
+                  <text x="290" y="22" textAnchor="middle" fill="#3b82f6" opacity="0.5" fontSize="7">Hughes Bros</text>
+                  <text x="380" y="22" textAnchor="middle" fill="#f97316" opacity="0.5" fontSize="7">JV Partner</text>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Dispute + Export */}
           <div className="grid sm:grid-cols-2 gap-5">
-            <Card className="border border-border overflow-hidden">
-              <CardContent className="p-0">
-                <div className="bg-muted/40 p-5 flex items-center justify-center border-b border-border min-h-[140px]">
-                  {/* SVG — disputed document state */}
-                  <svg viewBox="0 0 240 100" className="w-full max-w-[200px]" aria-label="Disputed document concept">
-                    <rect x="10" y="10" width="100" height="80" rx="6" className="fill-background stroke-destructive" strokeWidth="2" />
-                    <text x="60" y="40" textAnchor="middle" className="fill-foreground" fontSize="9" fontWeight="600">Payment App #4</text>
-                    <rect x="30" y="52" width="60" height="16" rx="3" className="fill-destructive" opacity="0.15" />
-                    <text x="60" y="63" textAnchor="middle" className="fill-destructive" fontSize="7" fontWeight="600">Disputed</text>
-                    <rect x="130" y="20" width="100" height="60" rx="6" className="fill-background stroke-border" strokeWidth="1.5" />
-                    <text x="180" y="42" textAnchor="middle" className="fill-muted-foreground" fontSize="8">History preserved</text>
-                    <text x="180" y="56" textAnchor="middle" className="fill-muted-foreground" fontSize="8">Evidence locked</text>
-                    <line x1="110" y1="50" x2="130" y2="50" className="stroke-destructive" strokeWidth="1.5" strokeDasharray="3 2" />
-                  </svg>
-                </div>
-                <div className="p-5">
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                    <AlertTriangle className="h-4 w-4 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-sm mb-1">Dispute Mode</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Surface contested documents, preserve history, and keep evidence intact. Built for adjudication, not just filing.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur overflow-hidden">
+              <div className="p-5 flex items-center justify-center border-b border-white/10 min-h-[140px]">
+                <svg viewBox="0 0 240 100" className="w-full max-w-[200px]" aria-label="Disputed document concept">
+                  <rect x="10" y="10" width="100" height="80" rx="6" fill="transparent" stroke="#ef4444" strokeWidth="2" />
+                  <text x="60" y="40" textAnchor="middle" fill="white" fontSize="9" fontWeight="600">Payment App #4</text>
+                  <rect x="30" y="52" width="60" height="16" rx="3" fill="#ef4444" opacity="0.2" />
+                  <text x="60" y="63" textAnchor="middle" fill="#ef4444" fontSize="7" fontWeight="600">Disputed</text>
+                  <rect x="130" y="20" width="100" height="60" rx="6" fill="transparent" stroke="white" strokeWidth="1" opacity="0.2" />
+                  <text x="180" y="42" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">History preserved</text>
+                  <text x="180" y="56" textAnchor="middle" fill="white" opacity="0.5" fontSize="8">Evidence locked</text>
+                  <line x1="110" y1="50" x2="130" y2="50" stroke="#ef4444" strokeWidth="1.5" strokeDasharray="3 2" />
+                </svg>
+              </div>
+              <div className="p-5">
+                <AlertTriangle className="h-4 w-4 text-primary mb-3" />
+                <h3 className="font-semibold text-sm mb-1 text-white">Dispute Mode</h3>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Surface contested documents, preserve history, and keep evidence intact. Built for adjudication, not just filing.
+                </p>
+              </div>
+            </div>
 
-            <Card className="border border-border overflow-hidden">
-              <CardContent className="p-0">
-                <div className="bg-muted/40 p-5 flex items-center justify-center border-b border-border min-h-[140px]">
-                  {/* SVG — evidence export */}
-                  <svg viewBox="0 0 240 100" className="w-full max-w-[200px]" aria-label="Evidence export concept">
-                    <rect x="20" y="10" width="90" height="80" rx="6" className="fill-background stroke-border" strokeWidth="1.5" />
-                    <text x="65" y="32" textAnchor="middle" className="fill-foreground" fontSize="8" fontWeight="600">Evidence Bundle</text>
-                    <line x1="35" y1="42" x2="95" y2="42" className="stroke-border" strokeWidth="1" />
-                    <text x="65" y="55" textAnchor="middle" className="fill-muted-foreground" fontSize="7">✓ Audit trail</text>
-                    <text x="65" y="67" textAnchor="middle" className="fill-muted-foreground" fontSize="7">✓ Blockchain proof</text>
-                    <text x="65" y="79" textAnchor="middle" className="fill-muted-foreground" fontSize="7">✓ Chain of custody</text>
-                    <rect x="140" y="30" width="80" height="40" rx="6" className="fill-primary" opacity="0.9" />
-                    <text x="180" y="54" textAnchor="middle" className="fill-primary-foreground" fontSize="9" fontWeight="600">Export PDF</text>
-                    <path d="M 110 50 L 140 50" className="stroke-primary" strokeWidth="2" markerEnd="url(#arrow)" />
-                    <defs>
-                      <marker id="arrow" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
-                        <path d="M 0 0 L 6 3 L 0 6 Z" className="fill-primary" />
-                      </marker>
-                    </defs>
-                  </svg>
-                </div>
-                <div className="p-5">
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                    <Download className="h-4 w-4 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-sm mb-1">One-click evidence export</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Assemble a dispute bundle with full audit trail and blockchain verification — ready for adjudicators, lawyers, or mediators.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur overflow-hidden">
+              <div className="p-5 flex items-center justify-center border-b border-white/10 min-h-[140px]">
+                <svg viewBox="0 0 240 100" className="w-full max-w-[200px]" aria-label="Evidence export concept">
+                  <rect x="20" y="10" width="90" height="80" rx="6" fill="transparent" stroke="white" strokeWidth="1" opacity="0.3" />
+                  <text x="65" y="32" textAnchor="middle" fill="white" fontSize="8" fontWeight="600">Evidence Bundle</text>
+                  <line x1="35" y1="42" x2="95" y2="42" stroke="white" strokeWidth="1" opacity="0.2" />
+                  <text x="65" y="55" textAnchor="middle" fill="white" opacity="0.5" fontSize="7">✓ Audit trail</text>
+                  <text x="65" y="67" textAnchor="middle" fill="white" opacity="0.5" fontSize="7">✓ Blockchain proof</text>
+                  <text x="65" y="79" textAnchor="middle" fill="white" opacity="0.5" fontSize="7">✓ Chain of custody</text>
+                  <rect x="140" y="30" width="80" height="40" rx="6" fill="hsl(263, 100%, 31%)" opacity="0.9" />
+                  <text x="180" y="54" textAnchor="middle" fill="white" fontSize="9" fontWeight="600">Export PDF</text>
+                  <path d="M 110 50 L 140 50" stroke="hsl(263, 100%, 31%)" strokeWidth="2" markerEnd="url(#arrow-dark)" />
+                  <defs>
+                    <marker id="arrow-dark" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+                      <path d="M 0 0 L 6 3 L 0 6 Z" fill="hsl(263, 100%, 31%)" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+              <div className="p-5">
+                <Download className="h-4 w-4 text-primary mb-3" />
+                <h3 className="font-semibold text-sm mb-1 text-white">One-click evidence export</h3>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Assemble a dispute bundle with full audit trail and blockchain verification — ready for adjudicators, lawyers, or mediators.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -403,9 +371,7 @@ const EarlyAccess = () => {
             ].map(({ icon: Icon, title, desc }) => (
               <Card key={title} className="border border-border">
                 <CardContent className="p-5 flex gap-4">
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Icon className="h-4 w-4 text-primary" />
-                  </div>
+                  <Icon className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-sm mb-1">{title}</h3>
                     <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
@@ -542,14 +508,13 @@ const EarlyAccess = () => {
       {/* Footer */}
       <footer className="border-t border-border py-10 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <span className="font-bold text-sm">
-              <span className="text-primary">Teranode</span> Sign
-            </span>
-            <p className="text-xs text-muted-foreground mt-1">
-              Secure document workflows with blockchain-backed proof and role-based control.
-            </p>
+          <div className="flex items-center gap-3">
+            <img src={teranodeLogo} alt="Teranode" className="h-6" />
+            <span className="font-bold text-sm">Sign</span>
           </div>
+          <p className="text-xs text-muted-foreground text-center md:text-left">
+            Secure document workflows with blockchain-backed proof and role-based control.
+          </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">
               Login
