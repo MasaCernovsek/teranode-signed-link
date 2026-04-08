@@ -12,6 +12,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Shield,
   Clock,
   Users,
@@ -20,7 +26,6 @@ import {
   Link2,
   Tag,
   Bell,
-  GitBranch,
   AlertTriangle,
   Download,
   CheckCircle2,
@@ -33,14 +38,99 @@ import {
   Layers,
 } from "lucide-react";
 
-import featureActions from "@/assets/feature-actions.svg";
-import featureSigningOrders from "@/assets/feature-signing-orders.svg";
-import featurePin from "@/assets/feature-pin.svg";
-import featureTags from "@/assets/feature-tags.svg";
 import teranodeLogo from "@/assets/teranode-logo.svg";
-import landingVerifyChain from "@/assets/landing-verify-chain.png";
-import landingAddRecipients from "@/assets/landing-add-recipients.png";
-import landingTeam from "@/assets/landing-team.jpg";
+import landingHero from "@/assets/landing-hero.svg";
+import landingUploadDocs from "@/assets/landing-upload-docs.svg";
+import landingDocVerification from "@/assets/landing-doc-verification.svg";
+import landingSigningOrders from "@/assets/landing-signing-orders.svg";
+import landingTags from "@/assets/landing-tags.svg";
+import landingActions from "@/assets/landing-actions.svg";
+import landingPin from "@/assets/landing-pin.svg";
+import landingBranching from "@/assets/landing-branching.svg";
+import landingMultiparty from "@/assets/landing-multiparty.svg";
+
+/* ── Timeline node data for hover previews ── */
+const timelineNodes = [
+  {
+    id: "master",
+    label: "Master Contract (JCT D&B)",
+    party: "All Parties",
+    date: "20 Jan 2025",
+    status: "Signed",
+    statusColor: "#16A34A",
+    statusBg: "#DCFCE7",
+    borderColor: "hsl(230, 10%, 75%)",
+    desc: "The governing agreement linking all downstream contracts and parties on this project.",
+    x: 170, y: 30, w: 180, h: 58,
+    lane: "shared",
+  },
+  {
+    id: "amendment",
+    label: "Amendment to SOW",
+    party: "Developer",
+    date: "14 Feb 2025",
+    status: "Signed",
+    statusColor: "#16A34A",
+    statusBg: "#DCFCE7",
+    borderColor: "#2150B5",
+    desc: "Scope of work amendment issued by the developer to adjust project requirements.",
+    x: 410, y: 25, w: 180, h: 58,
+    lane: "developer",
+  },
+  {
+    id: "revised-payment",
+    label: "Revised Payment Schedule",
+    party: "Developer",
+    date: "20 Feb 2025",
+    status: "Acknowledged",
+    statusColor: "#CA8A04",
+    statusBg: "#FEF9C3",
+    borderColor: "#2150B5",
+    desc: "Updated payment milestones following the scope amendment.",
+    x: 660, y: 25, w: 180, h: 58,
+    lane: "developer",
+  },
+  {
+    id: "subcontract",
+    label: "Subcontract Agreement",
+    party: "Main Contractor",
+    date: "3 Feb 2025",
+    status: "Signed",
+    statusColor: "#16A34A",
+    statusBg: "#DCFCE7",
+    borderColor: "#E8930C",
+    desc: "Formal agreement between the main contractor and the groundworks subcontractor.",
+    x: 410, y: 145, w: 180, h: 58,
+    lane: "main-contractor",
+  },
+  {
+    id: "payment-app",
+    label: "Payment Application #4",
+    party: "Main Contractor",
+    date: "1 Apr 2025",
+    status: "Issued",
+    statusColor: "#2563EB",
+    statusBg: "#DBEAFE",
+    borderColor: "#EF4444",
+    desc: "Interim payment claim submitted by the main contractor — currently disputed by the developer.",
+    x: 660, y: 145, w: 180, h: 58,
+    lane: "main-contractor",
+    disputed: true,
+  },
+  {
+    id: "site-notice",
+    label: "Site Commencement Notice",
+    party: "Groundworks Sub.",
+    date: "5 Feb 2025",
+    status: "Signed",
+    statusColor: "#16A34A",
+    statusBg: "#DCFCE7",
+    borderColor: "#22A55D",
+    desc: "Formal notification that site works have commenced under the subcontract.",
+    x: 660, y: 265, w: 180, h: 58,
+    lane: "groundworks",
+  },
+];
 
 const EarlyAccess = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -86,7 +176,9 @@ const EarlyAccess = () => {
         </div>
       </nav>
 
+      {/* ════════════════════════════════════════════ */}
       {/* ─── HERO ─── */}
+      {/* ════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
           <div>
@@ -122,31 +214,11 @@ const EarlyAccess = () => {
           {/* Hero product visual */}
           <div className="relative hidden md:block">
             <div className="absolute -top-8 -right-8 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
-            <div className="relative rounded-xl border border-border bg-card shadow-xl overflow-hidden">
-              <div className="p-3 border-b border-border flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-warning/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-accent/60" />
-                </div>
-                <span className="text-[11px] text-muted-foreground ml-2">Teranode Sign</span>
-              </div>
-              <img
-                src={landingAddRecipients}
-                alt="Add recipients and configure signing workflows"
-                className="w-full"
-              />
-            </div>
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 -left-4 bg-card border border-border rounded-lg shadow-lg p-3 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
-                <Link2 className="h-4 w-4 text-accent" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold">Blockchain anchored</p>
-                <p className="text-[11px] text-muted-foreground">Tamper-proof record</p>
-              </div>
-            </div>
+            <img
+              src={landingHero}
+              alt="Teranode Sign product interface"
+              className="w-full h-auto relative z-10"
+            />
           </div>
         </div>
       </section>
@@ -168,7 +240,9 @@ const EarlyAccess = () => {
         </div>
       </section>
 
-      {/* ─── LIVE SECTION ─── */}
+      {/* ════════════════════════════════════════════ */}
+      {/* ─── WHAT'S LIVE NOW ─── */}
+      {/* ════════════════════════════════════════════ */}
       <section className="py-20 md:py-28 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-2xl mb-16">
@@ -185,8 +259,8 @@ const EarlyAccess = () => {
             </p>
           </div>
 
-          {/* Feature 1 — hero-sized: Upload & sign */}
-          <div className="grid md:grid-cols-2 gap-8 items-center mb-20">
+          {/* Feature 1 — Upload & sign */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
             <div>
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <FileText className="h-5 w-5 text-primary" />
@@ -201,99 +275,117 @@ const EarlyAccess = () => {
                 <Link to="/">Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>
               </Button>
             </div>
-            <div className="rounded-xl border border-border bg-card shadow-lg overflow-hidden">
-              <div className="p-2.5 border-b border-border flex items-center gap-1.5">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-destructive/50" />
-                  <div className="w-2 h-2 rounded-full bg-warning/50" />
-                  <div className="w-2 h-2 rounded-full bg-accent/50" />
-                </div>
-              </div>
-              <img
-                src={landingAddRecipients}
-                alt="Recipient setup workflow"
-                className="w-full"
-                loading="lazy"
-              />
+            <div className="rounded-xl overflow-hidden">
+              <img src={landingUploadDocs} alt="Upload documents interface" className="w-full h-auto" loading="lazy" />
             </div>
           </div>
 
-          {/* Feature 2 — reversed: Blockchain timestamps */}
-          <div className="grid md:grid-cols-2 gap-8 items-center mb-20">
-            <div className="order-2 md:order-1 rounded-xl border border-border bg-card shadow-lg overflow-hidden">
-              <div className="p-2.5 border-b border-border flex items-center gap-1.5">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-destructive/50" />
-                  <div className="w-2 h-2 rounded-full bg-warning/50" />
-                  <div className="w-2 h-2 rounded-full bg-accent/50" />
-                </div>
-              </div>
-              <img
-                src={landingVerifyChain}
-                alt="Blockchain verification and on-chain proof"
-                className="w-full"
-                loading="lazy"
-              />
+          {/* Feature 2 — Document Verification (reversed) */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
+            <div className="order-2 md:order-1 rounded-xl overflow-hidden">
+              <img src={landingDocVerification} alt="Document verification with blockchain proof" className="w-full h-auto" loading="lazy" />
             </div>
             <div className="order-1 md:order-2">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Link2 className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Blockchain-backed timestamps</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Anchor each signed document to an independent, tamper-proof record.
-                Every signature and timestamp is verifiable on-chain — no single
-                party controls the proof.
+              <h3 className="text-xl font-bold mb-3">Document verification</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Verify any signed document against an independent, tamper-proof
+                blockchain record. Every signature and timestamp is provable
+                on-chain — no single party controls the proof.
               </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/">Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>
+              </Button>
             </div>
           </div>
 
-          {/* 4 smaller feature cards */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
-            {[
-              {
-                icon: ListOrdered,
-                title: "Custom signing flows",
-                desc: "Set sequential or custom signing orders for recipients to review and sign documents.",
-                img: featureSigningOrders,
-              },
-              {
-                icon: Tag,
-                title: "Tags and organisation",
-                desc: "Organise documents by project, counterparty, and type for faster retrieval.",
-                img: featureTags,
-              },
-              {
-                icon: Bell,
-                title: "Action dates and reminders",
-                desc: "Track expirations, renewals, and key contract milestones with reminders.",
-                img: featureActions,
-              },
-              {
-                icon: Lock,
-                title: "PIN-protected access",
-                desc: "Add an extra security layer with a one-time PIN for sensitive documents.",
-                img: featurePin,
-              },
-            ].map(({ icon: Icon, title, desc, img }) => (
-              <Card key={title} className="border border-border overflow-hidden group hover:shadow-md transition-shadow">
-                <CardContent className="p-0">
-                  <div className="bg-muted/30 p-4 flex items-center justify-center border-b border-border h-36">
-                    <img src={img} alt={title} className="max-h-full object-contain" loading="lazy" />
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon className="h-4 w-4 text-primary shrink-0" />
-                      <h3 className="font-semibold text-sm">{title}</h3>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          {/* Feature 3 — Custom signing flows */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
+            <div>
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <ListOrdered className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Custom signing flows</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Set sequential or custom signing orders for recipients to review
+                and sign documents. Control who signs first, who approves, and
+                who receives a copy.
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/">Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>
+              </Button>
+            </div>
+            <div className="rounded-xl overflow-hidden">
+              <img src={landingSigningOrders} alt="Custom signing order setup" className="w-full h-auto" loading="lazy" />
+            </div>
           </div>
 
-          <div className="text-center space-y-3">
+          {/* Feature 4 — Tags (reversed) */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
+            <div className="order-2 md:order-1 rounded-xl overflow-hidden">
+              <img src={landingTags} alt="Organise documents with tags" className="w-full h-auto" loading="lazy" />
+            </div>
+            <div className="order-1 md:order-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Tag className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Tags and organisation</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Organise documents by project, counterparty, and type for faster
+                retrieval. Build your own tagging structure to match how your
+                team works.
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/">Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Feature 5 — Action dates */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
+            <div>
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Bell className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Action dates and reminders</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Track expirations, renewals, and key contract milestones with
+                reminders. Never miss a deadline that could affect your
+                contractual position.
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/">Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>
+              </Button>
+            </div>
+            <div className="rounded-xl overflow-hidden">
+              <img src={landingActions} alt="Action dates and reminders" className="w-full h-auto" loading="lazy" />
+            </div>
+          </div>
+
+          {/* Feature 6 — PIN access (reversed) */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-14">
+            <div className="order-2 md:order-1 rounded-xl overflow-hidden">
+              <img src={landingPin} alt="PIN-protected document access" className="w-full h-auto" loading="lazy" />
+            </div>
+            <div className="order-1 md:order-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Lock className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">PIN-protected access</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Add an extra security layer with a one-time PIN for sensitive
+                documents. Control who can open, view, and interact with
+                confidential project records.
+              </p>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/">Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" /></Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="text-center space-y-3 pt-4">
             <p className="text-xs text-muted-foreground">
               Built for developers, main contractors, subcontractors, consultants, and multi-stakeholder project teams — including consortia and joint delivery teams.
             </p>
@@ -307,42 +399,58 @@ const EarlyAccess = () => {
         </div>
       </section>
 
-      {/* ─── HUMAN CONTEXT / TRANSITION ─── */}
-      <section className="relative py-20 px-6 bg-muted/20 overflow-hidden">
+      {/* ════════════════════════════════════════════ */}
+      {/* ─── THE PROBLEM ─── */}
+      {/* ════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28 px-6 bg-muted/20 border-y border-border">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-5">
-              Construction projects are multi-party.{" "}
-              <span className="text-primary">Your documentation should be too.</span>
-            </h2>
-            <p className="text-muted-foreground leading-relaxed mb-6">
-              Developers, main contractors, subcontractors, and consultants all
-              work on the same project but see different slices of the
-              documentation. When disputes happen, the paper trail is scattered,
-              incomplete, or contested. Teranode Sign keeps one provable record
-              across all parties.
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-3">
+              The problem
             </p>
-            <Button onClick={scrollToChainOfCustody} variant="outline">
-              See how it works <ChevronRight className="ml-1.5 h-4 w-4" />
-            </Button>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-5">
+              Construction disputes start as{" "}
+              <span className="text-primary">documentation problems.</span>
+            </h2>
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                Different parties hold different slices of the record. Contracts,
+                notices, variations, payment applications, and approvals live
+                across multiple systems — email threads, shared drives, filing
+                cabinets, and personal laptops.
+              </p>
+              <p>
+                By the time a dispute escalates, the paper trail is scattered,
+                incomplete, or contested. Different parties end up working from
+                different versions of the story.
+              </p>
+              <p className="font-medium text-foreground">
+                Teranode Sign keeps one provable record across all parties — so
+                when disputes happen, the evidence is already in order.
+              </p>
+            </div>
           </div>
-          <div className="relative rounded-2xl overflow-hidden shadow-xl">
-            <img
-              src={landingTeam}
-              alt="Construction team reviewing project documents"
-              className="w-full h-auto object-cover"
-              loading="lazy"
-              width={1280}
-              height={640}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { icon: FileText, text: "Contracts in email attachments" },
+              { icon: AlertTriangle, text: "Variations with no audit trail" },
+              { icon: Clock, text: "Missed notice deadlines" },
+              { icon: Users, text: "Different parties, different records" },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="rounded-xl border border-border bg-card p-5 flex flex-col items-center text-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <Icon className="h-5 w-5 text-destructive" />
+                </div>
+                <span className="text-sm font-medium leading-snug">{text}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════ */}
+      {/* ════════════════════════════════════════════════════════ */}
       {/* ─── PROJECT CHAIN OF CUSTODY — CORE VISUAL STORY ─── */}
-      {/* ═══════════════════════════════════════════════════════ */}
+      {/* ════════════════════════════════════════════════════════ */}
       <section id="chain-of-custody" className="py-24 md:py-32 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -359,117 +467,112 @@ const EarlyAccess = () => {
             </p>
           </div>
 
-          {/* Large branching timeline visual — using actual app elements */}
-          <div className="rounded-2xl border border-border bg-card shadow-2xl overflow-hidden mb-16">
-            <div className="p-3 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-warning/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-accent/60" />
+          {/* Interactive branching timeline */}
+          <TooltipProvider delayDuration={200}>
+            <div className="rounded-2xl border border-border bg-card shadow-2xl overflow-hidden mb-16">
+              <div className="p-3 border-b border-border flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-warning/60" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-accent/60" />
+                  </div>
+                  <span className="text-xs text-muted-foreground ml-2">Contract Timeline — Sample Project</span>
                 </div>
-                <span className="text-xs text-muted-foreground ml-2">Contract Timeline — Riverside Development</span>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="px-2 py-0.5 bg-muted rounded font-medium">Branch</span>
+                  <span className="px-2 py-0.5 rounded">List</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <span className="px-2 py-0.5 bg-muted rounded text-xs font-medium">Branch</span>
-                <span className="px-2 py-0.5 rounded text-xs">List</span>
+
+              <div className="p-6 md:p-10 overflow-x-auto">
+                <svg viewBox="0 0 900 340" className="w-full min-w-[700px]" aria-label="Project Chain of Custody — branching timeline">
+                  {/* Party lane labels + dashed lines */}
+                  <text x="10" y="57" fontSize="11" fontWeight="600" fill="hsl(230, 10%, 45%)" fontFamily="Inter, sans-serif">Shared</text>
+                  <line x1="120" y1="57" x2="880" y2="57" stroke="hsl(230, 10%, 45%)" strokeWidth="1" strokeDasharray="4 4" opacity="0.15" />
+
+                  <text x="10" y="147" fontSize="11" fontWeight="600" fill="#2150B5" fontFamily="Inter, sans-serif">Developer</text>
+                  <line x1="120" y1="147" x2="880" y2="147" stroke="#2150B5" strokeWidth="1" strokeDasharray="4 4" opacity="0.15" />
+
+                  <text x="10" y="237" fontSize="11" fontWeight="600" fill="#E8930C" fontFamily="Inter, sans-serif">Main Contractor</text>
+                  <line x1="140" y1="237" x2="880" y2="237" stroke="#E8930C" strokeWidth="1" strokeDasharray="4 4" opacity="0.15" />
+
+                  <text x="10" y="297" fontSize="11" fontWeight="600" fill="#22A55D" fontFamily="Inter, sans-serif">Groundworks Sub.</text>
+                  <line x1="140" y1="297" x2="880" y2="297" stroke="#22A55D" strokeWidth="1" strokeDasharray="4 4" opacity="0.15" />
+
+                  {/* Edges */}
+                  <path d="M 350 57 C 380 57, 380 50, 410 50" stroke="#2150B5" strokeWidth="1.5" fill="none" opacity="0.4" />
+                  <path d="M 350 57 C 380 57, 380 170, 410 170" stroke="#E8930C" strokeWidth="1.5" fill="none" opacity="0.4" />
+                  <line x1="590" y1="50" x2="660" y2="50" stroke="#2150B5" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.25" />
+                  <path d="M 590 170 C 620 170, 620 290, 660 290" stroke="#22A55D" strokeWidth="1.5" fill="none" opacity="0.4" />
+                  <line x1="590" y1="170" x2="660" y2="170" stroke="#E8930C" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.25" />
+
+                  {/* Interactive nodes */}
+                  {timelineNodes.map((node) => (
+                    <Tooltip key={node.id}>
+                      <TooltipTrigger asChild>
+                        <g className="cursor-pointer" tabIndex={0} role="button" aria-label={node.label}>
+                          {/* Disputed glow */}
+                          {node.disputed && (
+                            <rect x={node.x - 3} y={node.y - 3} width={node.w + 6} height={node.h + 6} rx="10" fill="none" stroke="#EF4444" strokeWidth="1" opacity="0.3" />
+                          )}
+                          {/* Card background */}
+                          <rect
+                            x={node.x} y={node.y} width={node.w} height={node.h} rx="8"
+                            fill="white" stroke={node.borderColor} strokeWidth={node.disputed ? 2 : 1.5}
+                            className="transition-all hover:filter hover:brightness-95"
+                          />
+                          {/* Title */}
+                          <text x={node.x + 10} y={node.y + 18} fontSize="11" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">
+                            {node.label.length > 24 ? node.label.substring(0, 24) + "…" : node.label}
+                          </text>
+                          {/* Party */}
+                          <text x={node.x + 10} y={node.y + 32} fontSize="10" fill={node.borderColor === "hsl(230, 10%, 75%)" ? "hsl(230, 10%, 45%)" : node.borderColor} fontFamily="Inter, sans-serif" fontWeight="500">
+                            {node.party}
+                          </text>
+                          {/* Date */}
+                          <text x={node.x + 10} y={node.y + 45} fontSize="10" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">
+                            {node.date}
+                          </text>
+                          {/* Status pill */}
+                          <rect x={node.x + node.w - 70} y={node.y + node.h - 20} width={node.status === "Acknowledged" ? 66 : 44} height="14" rx="3" fill={node.statusBg} />
+                          <text x={node.x + node.w - 66} y={node.y + node.h - 10} fontSize="8" fontWeight="600" fill={node.statusColor} fontFamily="Inter, sans-serif">
+                            {node.status}
+                          </text>
+                          {/* Dispute pill */}
+                          {node.disputed && (
+                            <>
+                              <rect x={node.x + 10} y={node.y + node.h - 20} width="44" height="14" rx="3" fill="#FEE2E2" />
+                              <text x={node.x + 14} y={node.y + node.h - 10} fontSize="8" fontWeight="600" fill="#EF4444" fontFamily="Inter, sans-serif">Disputed</text>
+                            </>
+                          )}
+                        </g>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs p-3">
+                        <p className="font-semibold text-sm mb-1">{node.label}</p>
+                        <p className="text-xs text-muted-foreground mb-1">{node.party} · {node.date}</p>
+                        <p className="text-xs text-muted-foreground mb-2">{node.desc}</p>
+                        <span
+                          className="inline-block text-xs font-semibold px-2 py-0.5 rounded"
+                          style={{ backgroundColor: node.statusBg, color: node.statusColor }}
+                        >
+                          {node.status}
+                        </span>
+                        {node.disputed && (
+                          <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded ml-1.5" style={{ backgroundColor: "#FEE2E2", color: "#EF4444" }}>
+                            Disputed
+                          </span>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </svg>
               </div>
             </div>
+          </TooltipProvider>
 
-            {/* The branching timeline SVG — modeled on the actual app */}
-            <div className="p-6 md:p-10 overflow-x-auto">
-              <svg viewBox="0 0 900 380" className="w-full min-w-[700px]" aria-label="Project Chain of Custody — branching timeline showing contracts flowing across multiple parties">
-                {/* Party lane labels + dashed lines */}
-                <text x="10" y="62" fontSize="12" fontWeight="600" fill="hsl(230, 10%, 45%)" fontFamily="Inter, sans-serif">Shared</text>
-                <line x1="120" y1="62" x2="880" y2="62" stroke="hsl(230, 10%, 45%)" strokeWidth="1" strokeDasharray="4 4" opacity="0.2" />
-
-                <text x="10" y="152" fontSize="12" fontWeight="600" fill="#2150B5" fontFamily="Inter, sans-serif">Apex Homes Ltd</text>
-                <line x1="150" y1="152" x2="880" y2="152" stroke="#2150B5" strokeWidth="1" strokeDasharray="4 4" opacity="0.2" />
-
-                <text x="10" y="242" fontSize="12" fontWeight="600" fill="#E8930C" fontFamily="Inter, sans-serif">Hughes Bros</text>
-                <line x1="120" y1="242" x2="880" y2="242" stroke="#E8930C" strokeWidth="1" strokeDasharray="4 4" opacity="0.2" />
-
-                <text x="10" y="332" fontSize="12" fontWeight="600" fill="#22A55D" fontFamily="Inter, sans-serif">RM Groundworks</text>
-                <line x1="150" y1="332" x2="880" y2="332" stroke="#22A55D" strokeWidth="1" strokeDasharray="4 4" opacity="0.2" />
-
-                {/* Edges */}
-                {/* Master → Amendment SOW (Apex) */}
-                <path d="M 350 62 C 380 62, 380 152, 410 152" stroke="#2150B5" strokeWidth="2" fill="none" opacity="0.5" />
-                {/* Master → Subcontract (Hughes) */}
-                <path d="M 350 62 C 380 62, 380 242, 410 242" stroke="#E8930C" strokeWidth="2" fill="none" opacity="0.5" />
-                {/* Amendment → Revised Payment (Apex) */}
-                <line x1="590" y1="152" x2="660" y2="152" stroke="#2150B5" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.3" />
-                {/* Subcontract → Site Commencement (RM) */}
-                <path d="M 590 242 C 620 242, 620 332, 660 332" stroke="#22A55D" strokeWidth="2" fill="none" opacity="0.5" />
-                {/* Subcontract → Payment App (Hughes) */}
-                <line x1="590" y1="242" x2="660" y2="242" stroke="#E8930C" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.3" />
-                {/* Convergence lines to Practical Completion */}
-                <path d="M 840 152 C 860 152, 860 62, 870 62" stroke="#2150B5" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.2" />
-
-                {/* Branch junction icons */}
-                <circle cx="380" cy="107" r="8" fill="white" stroke="hsl(230, 10%, 80%)" strokeWidth="1" />
-                <text x="380" y="110" textAnchor="middle" fontSize="8" fill="hsl(230, 10%, 45%)">🔗</text>
-
-                <circle cx="620" cy="287" r="8" fill="white" stroke="hsl(230, 10%, 80%)" strokeWidth="1" />
-                <text x="620" y="290" textAnchor="middle" fontSize="8" fill="hsl(230, 10%, 45%)">🔗</text>
-
-                {/* ── NODES ── */}
-                {/* Master Contract */}
-                <rect x="170" y="30" width="180" height="64" rx="8" fill="white" stroke="hsl(230, 10%, 80%)" strokeWidth="1.5" />
-                <text x="180" y="49" fontSize="12" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">Master Contract (JCT D&B)</text>
-                <text x="180" y="63" fontSize="11" fill="hsl(230, 10%, 45%)" fontFamily="Inter, sans-serif">All Parties</text>
-                <text x="180" y="76" fontSize="11" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">20 Jan 2025</text>
-                <rect x="290" y="68" width="50" height="16" rx="3" fill="#DCFCE7" />
-                <text x="296" y="79" fontSize="10" fontWeight="600" fill="#16A34A" fontFamily="Inter, sans-serif">Signed</text>
-
-                {/* Amendment to SOW */}
-                <rect x="410" y="120" width="180" height="64" rx="8" fill="white" stroke="#2150B5" strokeWidth="1.5" />
-                <text x="420" y="139" fontSize="12" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">Amendment to SOW</text>
-                <text x="420" y="153" fontSize="11" fill="#2150B5" fontFamily="Inter, sans-serif" fontWeight="500">Apex Homes Ltd</text>
-                <text x="420" y="167" fontSize="11" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">14 Feb 2025</text>
-                <rect x="530" y="158" width="50" height="16" rx="3" fill="#DCFCE7" />
-                <text x="536" y="169" fontSize="10" fontWeight="600" fill="#16A34A" fontFamily="Inter, sans-serif">Signed</text>
-
-                {/* Revised Payment Schedule */}
-                <rect x="660" y="120" width="180" height="64" rx="8" fill="white" stroke="#2150B5" strokeWidth="1.5" />
-                <text x="670" y="139" fontSize="12" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">Revised Payment Schedule</text>
-                <text x="670" y="153" fontSize="11" fill="#2150B5" fontFamily="Inter, sans-serif" fontWeight="500">Apex Homes Ltd</text>
-                <text x="670" y="167" fontSize="11" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">20 Feb 2025</text>
-                <rect x="772" y="158" width="58" height="16" rx="3" fill="#FEF9C3" />
-                <text x="777" y="169" fontSize="9" fontWeight="600" fill="#CA8A04" fontFamily="Inter, sans-serif">Acknowledged</text>
-
-                {/* Subcontract Agreement */}
-                <rect x="410" y="210" width="180" height="64" rx="8" fill="white" stroke="#E8930C" strokeWidth="1.5" />
-                <text x="420" y="229" fontSize="11" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">Subcontract Agreement</text>
-                <text x="420" y="243" fontSize="11" fill="#E8930C" fontFamily="Inter, sans-serif" fontWeight="500">Hughes Bros</text>
-                <text x="420" y="257" fontSize="11" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">3 Feb 2025</text>
-                <rect x="530" y="248" width="50" height="16" rx="3" fill="#DCFCE7" />
-                <text x="536" y="259" fontSize="10" fontWeight="600" fill="#16A34A" fontFamily="Inter, sans-serif">Signed</text>
-
-                {/* Payment Application #4 — disputed */}
-                <rect x="660" y="210" width="180" height="64" rx="8" fill="white" stroke="#EF4444" strokeWidth="2" />
-                <rect x="657" y="207" width="186" height="70" rx="10" fill="none" stroke="#EF4444" strokeWidth="1" opacity="0.25" />
-                <text x="670" y="229" fontSize="11" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">Payment Application #4</text>
-                <text x="670" y="243" fontSize="11" fill="#E8930C" fontFamily="Inter, sans-serif" fontWeight="500">Hughes Bros</text>
-                <text x="670" y="257" fontSize="11" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">1 Apr 2025</text>
-                <rect x="770" y="248" width="42" height="16" rx="3" fill="#DBEAFE" />
-                <text x="775" y="259" fontSize="10" fontWeight="600" fill="#2563EB" fontFamily="Inter, sans-serif">Issued</text>
-                <rect x="670" y="268" width="55" height="15" rx="3" fill="#FEE2E2" />
-                <text x="675" y="278" fontSize="9" fontWeight="600" fill="#EF4444" fontFamily="Inter, sans-serif">Disputed</text>
-
-                {/* Site Commencement Notice */}
-                <rect x="660" y="300" width="180" height="64" rx="8" fill="white" stroke="#22A55D" strokeWidth="1.5" />
-                <text x="670" y="319" fontSize="11" fontWeight="600" fill="hsl(230, 25%, 15%)" fontFamily="Inter, sans-serif">Site Commencement Notice</text>
-                <text x="670" y="333" fontSize="11" fill="#22A55D" fontFamily="Inter, sans-serif" fontWeight="500">RM Groundworks Ltd</text>
-                <text x="670" y="347" fontSize="11" fill="hsl(230, 10%, 55%)" fontFamily="Inter, sans-serif">5 Feb 2025</text>
-                <rect x="800" y="338" width="50" height="16" rx="3" fill="#DCFCE7" />
-                <text x="806" y="349" fontSize="10" fontWeight="600" fill="#16A34A" fontFamily="Inter, sans-serif">Signed</text>
-              </svg>
-            </div>
-          </div>
-
-          {/* Chain of Custody supporting text */}
-          <div className="grid md:grid-cols-3 gap-8 mb-10">
+          {/* Supporting text */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="text-center md:text-left">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3 mx-auto md:mx-0">
                 <Layers className="h-5 w-5 text-primary" />
@@ -503,6 +606,16 @@ const EarlyAccess = () => {
             </div>
           </div>
 
+          {/* Branching + Multi-party SVG visuals */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src={landingBranching} alt="Branching document relationships" className="w-full h-auto" loading="lazy" />
+            </div>
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img src={landingMultiparty} alt="Multi-party project collaboration" className="w-full h-auto" loading="lazy" />
+            </div>
+          </div>
+
           <div className="text-center">
             <Button size="lg" onClick={scrollToSignup} className="text-base px-8">
               Join the pilot programme <ArrowRight className="ml-2 h-4 w-4" />
@@ -512,13 +625,13 @@ const EarlyAccess = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════ */}
-      {/* ─── DARK SECTION — FUTURE / PILOT / CONVERSION ZONE ─── */}
+      {/* ─── DARK SECTION — PILOT / FUTURE / CONVERSION ZONE ─── */}
       {/* ═══════════════════════════════════════════════════════════ */}
       <section className="py-24 md:py-32 px-6 bg-[hsl(228,30%,10%)]">
         <div className="max-w-7xl mx-auto">
           {/* Label */}
           <div className="flex justify-center mb-10">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/90 bg-primary/20 border border-primary/30 px-4 py-1.5 rounded-full">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white bg-primary/30 border border-primary/40 px-4 py-1.5 rounded-full">
               <Clock className="h-3 w-3" /> In development with pilot users
             </span>
           </div>
@@ -535,10 +648,10 @@ const EarlyAccess = () => {
             </p>
           </div>
 
-          {/* Dispute Mode + Evidence Export — two alternating blocks */}
-          <div className="grid md:grid-cols-2 gap-8 items-center mb-20">
+          {/* Dispute Mode */}
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
             <div>
-              <div className="w-10 h-10 rounded-lg bg-destructive/20 flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center mb-4">
                 <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
               <h3 className="text-xl font-bold mb-3 text-white">Dispute Mode</h3>
@@ -548,7 +661,7 @@ const EarlyAccess = () => {
                 entire chain of custody is frozen and protected — ready for
                 adjudication, not just filing.
               </p>
-              <Button variant="outline" size="sm" onClick={scrollToSignup} className="border-white/20 text-white hover:bg-white/10">
+              <Button size="sm" onClick={scrollToSignup} className="bg-primary text-white hover:bg-primary/90">
                 Learn more <ChevronRight className="ml-1.5 h-3.5 w-3.5" />
               </Button>
             </div>
@@ -556,7 +669,7 @@ const EarlyAccess = () => {
               <svg viewBox="0 0 400 160" className="w-full" aria-label="Dispute mode — contested document">
                 <rect x="10" y="10" width="170" height="70" rx="8" fill="transparent" stroke="#EF4444" strokeWidth="2" />
                 <text x="25" y="32" fontSize="11" fontWeight="600" fill="white" fontFamily="Inter, sans-serif">Payment Application #4</text>
-                <text x="25" y="47" fontSize="10" fill="#E8930C" fontFamily="Inter, sans-serif">Hughes Bros</text>
+                <text x="25" y="47" fontSize="10" fill="#E8930C" fontFamily="Inter, sans-serif">Main Contractor</text>
                 <text x="25" y="62" fontSize="10" fill="white" opacity="0.5" fontFamily="Inter, sans-serif">1 Apr 2025</text>
                 <rect x="25" y="66" width="55" height="14" rx="3" fill="#FEE2E2" />
                 <text x="30" y="76" fontSize="8" fontWeight="600" fill="#EF4444" fontFamily="Inter, sans-serif">Disputed</text>
@@ -571,13 +684,13 @@ const EarlyAccess = () => {
 
                 <rect x="10" y="100" width="380" height="50" rx="8" fill="hsl(0, 60%, 20%)" opacity="0.3" />
                 <text x="25" y="122" fontSize="10" fill="#FCA5A5" fontFamily="Inter, sans-serif" fontWeight="500">⚠ Freeze scope: contested documents only</text>
-                <text x="25" y="138" fontSize="9" fill="white" opacity="0.5" fontFamily="Inter, sans-serif">Disputed by Apex Homes Ltd — 10 Apr 2025</text>
+                <text x="25" y="138" fontSize="9" fill="white" opacity="0.5" fontFamily="Inter, sans-serif">Disputed by Developer — 10 Apr 2025</text>
               </svg>
             </div>
           </div>
 
           {/* Evidence Export — reversed */}
-          <div className="grid md:grid-cols-2 gap-8 items-center mb-24">
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-24">
             <div className="order-2 md:order-1 rounded-xl border border-white/10 bg-white/5 p-6 md:p-8">
               <svg viewBox="0 0 400 160" className="w-full" aria-label="One-click evidence export">
                 <rect x="10" y="10" width="160" height="140" rx="8" fill="transparent" stroke="white" strokeWidth="1" opacity="0.2" />
@@ -590,9 +703,9 @@ const EarlyAccess = () => {
                 <text x="25" y="122" fontSize="10" fill="white" opacity="0.6" fontFamily="Inter, sans-serif">✓ Dispute timeline</text>
                 <text x="25" y="138" fontSize="10" fill="white" opacity="0.6" fontFamily="Inter, sans-serif">✓ Party access log</text>
 
-                <path d="M 185 80 L 230 80" stroke="hsl(270, 80%, 60%)" strokeWidth="2" markerEnd="url(#arrow-export)" />
+                <path d="M 185 80 L 230 80" stroke="hsl(270, 80%, 60%)" strokeWidth="2" markerEnd="url(#arrow-export-v2)" />
                 <defs>
-                  <marker id="arrow-export" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto">
+                  <marker id="arrow-export-v2" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto">
                     <path d="M 0 0 L 8 4 L 0 8 Z" fill="hsl(270, 80%, 60%)" />
                   </marker>
                 </defs>
@@ -612,7 +725,7 @@ const EarlyAccess = () => {
                 verification, chain of custody record, and party access log — ready
                 for adjudicators, lawyers, or mediators. One click, one PDF.
               </p>
-              <Button variant="outline" size="sm" onClick={scrollToSignup} className="border-white/20 text-white hover:bg-white/10">
+              <Button size="sm" onClick={scrollToSignup} className="bg-primary text-white hover:bg-primary/90">
                 View pilot features <ChevronRight className="ml-1.5 h-3.5 w-3.5" />
               </Button>
             </div>
@@ -621,72 +734,105 @@ const EarlyAccess = () => {
           {/* Divider */}
           <div className="border-t border-white/10 mb-20" />
 
-          {/* WHO THIS IS FOR */}
-          <div className="grid md:grid-cols-2 gap-16 mb-20">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-6 text-white">
+          {/* ─── WHO THIS PILOT IS FOR ─── */}
+          <div className="mb-24">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-4">
                 Who this pilot is for
               </h2>
-              <ul className="space-y-4">
-                {[
-                  "Developers or main contractors dealing with payment disputes, adjudication, or contentious variations",
-                  "Commercial managers, QSs, legal teams, or project managers responsible for documentation and evidence",
-                  "Specialist subcontractors who need better visibility and proof of what was issued, signed, or disputed",
-                  "Teams willing to give 20–30 minutes of feedback per month during the pilot",
-                ].map((item) => (
-                  <li key={item} className="flex gap-3 items-start">
-                    <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0 mt-0.5" />
-                    <span className="text-sm text-white/80 leading-relaxed">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-3 mt-8">
-                <Button onClick={scrollToSignup} className="bg-primary hover:bg-primary/90">
-                  Apply for early access <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Button>
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10" asChild>
-                  <a href="mailto:contact@teranode.io">Talk to us</a>
-                </Button>
-              </div>
+              <p className="text-white/60 leading-relaxed">
+                We're looking for construction teams who deal with real documentation
+                challenges and want to help shape a better solution.
+              </p>
             </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto mb-10">
+              {[
+                {
+                  title: "Developers & main contractors",
+                  desc: "Dealing with payment disputes, adjudication, or contentious variations across multiple subcontracts.",
+                },
+                {
+                  title: "Commercial managers & QSs",
+                  desc: "Responsible for documentation accuracy, evidence preparation, and contract compliance across project phases.",
+                },
+                {
+                  title: "Legal teams & project managers",
+                  desc: "Managing dispute readiness, audit trails, and ensuring documentation meets evidential standards.",
+                },
+                {
+                  title: "Specialist subcontractors",
+                  desc: "Need better visibility into what was issued, signed, or disputed — and provable records of their own submissions.",
+                },
+                {
+                  title: "Consortia & joint delivery teams",
+                  desc: "Multi-stakeholder structures where documentation ownership and control flow across organisational boundaries.",
+                },
+                {
+                  title: "Teams willing to give feedback",
+                  desc: "20–30 minutes per month to share what works, what doesn't, and what matters most for your workflows.",
+                },
+              ].map(({ title, desc }) => (
+                <div key={title} className="rounded-xl border border-white/10 bg-white/5 p-5">
+                  <h3 className="font-semibold text-sm text-white mb-2">{title}</h3>
+                  <p className="text-xs text-white/60 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button onClick={scrollToSignup} className="bg-primary text-white hover:bg-primary/90">
+                Apply for early access <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+              <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 hover:text-white" asChild>
+                <a href="mailto:contact@teranode.io">Talk to us</a>
+              </Button>
+            </div>
+          </div>
 
-            {/* Why Teranode Sign */}
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-6 text-white">
+          {/* Divider */}
+          <div className="border-t border-white/10 mb-20" />
+
+          {/* ─── WHY TERANODE SIGN ─── */}
+          <div className="mb-24">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-4">
                 Why Teranode Sign
               </h2>
-              <div className="space-y-4">
-                {[
-                  {
-                    icon: Shield,
-                    title: "Secure and compliant workflows",
-                    desc: "Signing workflows designed for regulated industries — construction, infrastructure, and engineering.",
-                  },
-                  {
-                    icon: Link2,
-                    title: "Tamper-proof records",
-                    desc: "Blockchain verification means no one can alter a record after the fact.",
-                  },
-                  {
-                    icon: Server,
-                    title: "Full control over data",
-                    desc: "Choose cloud-hosted isolated environments or on-premises deployment.",
-                  },
-                  {
-                    icon: Users,
-                    title: "Role-based access",
-                    desc: "Separate permissions for requestors, signers, and third parties.",
-                  },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="flex gap-3">
-                    <Icon className="h-4 w-4 text-purple-400 shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-sm text-white mb-0.5">{title}</h3>
-                      <p className="text-xs text-white/60 leading-relaxed">{desc}</p>
-                    </div>
+              <p className="text-white/60 leading-relaxed">
+                Security, auditability, and deployment flexibility — built for
+                regulated industries and multi-stakeholder workflows.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+              {[
+                {
+                  icon: Shield,
+                  title: "Secure and compliant",
+                  desc: "Signing workflows designed for regulated industries — construction, infrastructure, and engineering.",
+                },
+                {
+                  icon: Link2,
+                  title: "Tamper-proof records",
+                  desc: "Blockchain verification means no one can alter a record after the fact.",
+                },
+                {
+                  icon: Server,
+                  title: "Full control over data",
+                  desc: "Choose cloud-hosted isolated environments or on-premises deployment.",
+                },
+                {
+                  icon: Users,
+                  title: "Role-based access",
+                  desc: "Separate permissions for requestors, signers, and third parties.",
+                },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="rounded-xl border border-white/10 bg-white/5 p-5 text-center">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto">
+                    <Icon className="h-5 w-5 text-purple-300" />
                   </div>
-                ))}
-              </div>
+                  <h3 className="font-semibold text-sm text-white mb-2">{title}</h3>
+                  <p className="text-xs text-white/60 leading-relaxed">{desc}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -785,7 +931,7 @@ const EarlyAccess = () => {
                     className="min-h-[80px] bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-primary focus:ring-primary"
                   />
                 </div>
-                <Button type="submit" className="w-full" size="lg">
+                <Button type="submit" className="w-full bg-primary text-white hover:bg-primary/90" size="lg">
                   Apply for early access
                 </Button>
               </form>
