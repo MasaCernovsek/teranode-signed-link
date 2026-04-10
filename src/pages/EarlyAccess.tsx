@@ -92,6 +92,8 @@ function Reveal({ children, className = "", delay = 0 }: { children: React.React
 
 const EarlyAccess = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [heroCtasInView, setHeroCtasInView] = useState(true);
+  const heroCtasRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     name: "",
     company: "",
@@ -100,6 +102,24 @@ const EarlyAccess = () => {
     pain: "",
     email: "",
   });
+
+  useEffect(() => {
+    const el = heroCtasRef.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        setHeroCtasInView(Boolean(entry?.isIntersecting));
+      },
+      // Flip as soon as the hero CTA row leaves the viewport.
+      { threshold: 0 }
+    );
+
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,16 +147,29 @@ const EarlyAccess = () => {
             <img src={teranodeLogo} alt="Teranode Sign" className="h-7" />
           </div>
           <div className="flex items-center gap-3">
+            {!heroCtasInView && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[rgb(40,175,96)] bg-[rgb(40,175,96)] text-white hover:bg-white hover:text-slate-900"
+                  asChild
+                >
+                  <a href={SIGNUP_URL} target="_blank" rel="noopener noreferrer">Start trial</a>
+                </Button>
+                <Button size="sm" onClick={scrollToSignup}>
+                  Apply to join the pilot
+                </Button>
+              </>
+            )}
+
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="border-[rgb(40,175,96)] bg-[rgb(40,175,96)] text-white hover:bg-white hover:text-slate-900"
+              className="ml-1 text-primary hover:bg-transparent hover:text-primary border border-transparent hover:border-primary"
               asChild
             >
-              <a href={SIGNUP_URL}>Start trial</a>
-            </Button>
-            <Button size="sm" onClick={scrollToSignup}>
-              Apply to join the pilot
+              <a href={LOGIN_URL} target="_blank" rel="noopener noreferrer">Login</a>
             </Button>
           </div>
         </div>
@@ -161,7 +194,7 @@ const EarlyAccess = () => {
               important documents to the blockchain — and we’re now recruiting
               teams to shape our next features for disputes and chain of custody.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
+            <div ref={heroCtasRef} className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
               <Button size="lg" onClick={scrollToSignup} className="text-base px-8">
                 Apply to join the pilot <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -171,15 +204,9 @@ const EarlyAccess = () => {
                 className="border-[rgb(40,175,96)] bg-[rgb(40,175,96)] text-white hover:bg-white hover:text-slate-900 text-base px-8"
                 asChild
               >
-                <a href={SIGNUP_URL}>Start trial</a>
+                <a href={SIGNUP_URL} target="_blank" rel="noopener noreferrer">Start trial</a>
               </Button>
             </div>
-            <button
-              onClick={scrollToChainOfCustody}
-              className="text-sm text-primary font-medium hover:underline flex items-center gap-1 transition-colors mx-auto"
-            >
-              See how Project Chain of Custody works <ChevronRight className="h-3.5 w-3.5" />
-            </button>
           </div>
 
           {/* Hero product visual — larger, more prominent */}
@@ -195,21 +222,7 @@ const EarlyAccess = () => {
       </section>
 
       {/* ─── TRUST STRIP ─── */}
-      <section className="border-y border-border bg-muted/30 py-10 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { icon: Link2, label: "Blockchain-backed timestamps" },
-            { icon: Shield, label: "Tamper-proof audit trail" },
-            { icon: Users, label: "Role-based access & signing" },
-            { icon: Server, label: "Cloud-hosted or on-premises" },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex flex-col items-center text-center gap-2">
-              <Icon className="h-5 w-5 text-primary" />
-              <span className="text-xs font-medium">{label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* (Trust strip removed — keep page tighter and avoid repeating proofs.) */}
 
       {/* ════════════════════════════════════════════ */}
       {/* ─── WHAT'S LIVE NOW ─── */}
@@ -219,7 +232,7 @@ const EarlyAccess = () => {
           <Reveal>
             <div className="max-w-2xl mb-16">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-3">
-                Available in the app today
+                Live now
               </p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 What's live and ready now
@@ -236,8 +249,8 @@ const EarlyAccess = () => {
           <Reveal>
             <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
               <div>
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <FileText className="h-5 w-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <FileText className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Upload and request signatures</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
@@ -245,11 +258,6 @@ const EarlyAccess = () => {
                   Set up recipients, assign signing roles, and track every step of
                   the workflow in one place.
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={SIGNUP_URL}>
-                    Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </a>
-                </Button>
               </div>
               <div className="rounded-xl overflow-hidden">
                 <img src={landingUploadDocs} alt="Upload documents interface" className="w-full h-auto" loading="lazy" />
@@ -264,8 +272,8 @@ const EarlyAccess = () => {
                 <img src={landingDocVerification} alt="Document verification with blockchain proof" className="w-full h-auto" loading="lazy" />
               </div>
               <div className="order-1 md:order-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Link2 className="h-5 w-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Link2 className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Document verification</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
@@ -273,11 +281,6 @@ const EarlyAccess = () => {
                   blockchain record. Every signature and timestamp is provable
                   on-chain — no single party controls the proof.
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={SIGNUP_URL}>
-                    Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </a>
-                </Button>
               </div>
             </div>
           </Reveal>
@@ -286,8 +289,8 @@ const EarlyAccess = () => {
           <Reveal>
             <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
               <div>
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <ListOrdered className="h-5 w-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <ListOrdered className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Custom signing flows</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
@@ -295,11 +298,6 @@ const EarlyAccess = () => {
                   and sign documents. Control who signs first, who approves, and
                   who receives a copy.
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={SIGNUP_URL}>
-                    Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </a>
-                </Button>
               </div>
               <div className="rounded-xl overflow-hidden">
                 <img src={landingSigningOrders} alt="Custom signing order setup" className="w-full h-auto" loading="lazy" />
@@ -314,8 +312,8 @@ const EarlyAccess = () => {
                 <img src={landingTags} alt="Organise documents with tags" className="w-full h-auto" loading="lazy" />
               </div>
               <div className="order-1 md:order-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Tag className="h-5 w-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Tag className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Tags and organisation</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
@@ -323,11 +321,6 @@ const EarlyAccess = () => {
                   retrieval. Build your own tagging structure to match how your
                   team works.
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={SIGNUP_URL}>
-                    Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </a>
-                </Button>
               </div>
             </div>
           </Reveal>
@@ -336,8 +329,8 @@ const EarlyAccess = () => {
           <Reveal>
             <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
               <div>
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Bell className="h-5 w-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Bell className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Action dates and reminders</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
@@ -345,11 +338,6 @@ const EarlyAccess = () => {
                   reminders. Never miss a deadline that could affect your
                   contractual position.
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={SIGNUP_URL}>
-                    Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </a>
-                </Button>
               </div>
               <div className="rounded-xl overflow-hidden">
                 <img src={landingActions} alt="Action dates and reminders" className="w-full h-auto" loading="lazy" />
@@ -364,8 +352,8 @@ const EarlyAccess = () => {
                 <img src={landingPin} alt="PIN-protected document access" className="w-full h-auto" loading="lazy" />
               </div>
               <div className="order-1 md:order-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Lock className="h-5 w-5 text-primary" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Lock className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">PIN-protected access</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
@@ -373,21 +361,13 @@ const EarlyAccess = () => {
                   documents. Control who can open, view, and interact with
                   confidential project records.
                 </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={SIGNUP_URL}>
-                    Try it now <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </a>
-                </Button>
               </div>
             </div>
           </Reveal>
 
           <div className="text-center space-y-3 pt-4">
-            <p className="text-xs text-muted-foreground">
-              Built for developers, main contractors, subcontractors, consultants, and multi-stakeholder project teams — including consortia and joint delivery teams.
-            </p>
             <p className="text-sm font-semibold text-primary">
-              The app is up and running and used by legal teams today.
+              Used by legal teams today — built for teams managing high-stakes project records.
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               <Button
@@ -396,15 +376,105 @@ const EarlyAccess = () => {
                 className="border-[rgb(40,175,96)] bg-[rgb(40,175,96)] text-white hover:bg-white hover:text-slate-900"
                 asChild
               >
-                <a href={SIGNUP_URL}>
+                <a href={SIGNUP_URL} target="_blank" rel="noopener noreferrer">
                   Start your trial <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </a>
               </Button>
               <Button variant="outline" size="sm" asChild>
-                <a href={DOCS_URL}>Read the docs</a>
+                <a href={DOCS_URL} target="_blank" rel="noopener noreferrer">Read the docs</a>
               </Button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════ */}
+      {/* ─── WHY THIS MATTERS (BRIDGE) ─── */}
+      {/* ════════════════════════════════════════════ */}
+      <section className="py-28 md:py-36 px-6 bg-muted/10 border-y border-border/70">
+        <div className="max-w-7xl mx-auto">
+          <Reveal>
+            <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-[rgba(255,252,250,0.72)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),inset_0_-1px_0_rgba(15,23,42,0.06)]">
+              {/* Subtle “record” motif (very low-contrast, non-decorative) */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 opacity-[0.08]"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(0deg, rgba(15,23,42,1) 0px, rgba(15,23,42,1) 1px, transparent 1px, transparent 18px)",
+                  maskImage: "radial-gradient(60% 55% at 75% 35%, black 0%, transparent 70%)",
+                  WebkitMaskImage: "radial-gradient(60% 55% at 75% 35%, black 0%, transparent 70%)",
+                }}
+              />
+
+              <div className="relative grid gap-10 px-7 py-12 md:px-12 md:py-16 md:grid-cols-12 md:items-start">
+                {/* Left: eyebrow + headline */}
+                <div className="md:col-span-4 md:pt-0.5">
+                  <div className="mb-6 flex items-center gap-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(40,175,96)]">
+                      Why this matters
+                    </p>
+                  </div>
+
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-[1.12]">
+                    We’ve built the foundations. Now we’re tackling the bigger problem.
+                  </h2>
+                </div>
+
+                {/* Right: supporting copy + small pull-note */}
+                <div className="relative md:col-span-8 md:pt-1 md:border-l md:border-border/40 md:pl-10">
+                  {/* Ledger grid (ultra-subtle) behind the right column */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 left-0 right-0 -z-0 hidden md:block opacity-[0.035]"
+                    style={{
+                      backgroundImage:
+                        "repeating-linear-gradient(0deg, rgba(15,23,42,1) 0px, rgba(15,23,42,1) 1px, transparent 1px, transparent 20px), repeating-linear-gradient(90deg, rgba(15,23,42,1) 0px, rgba(15,23,42,1) 1px, transparent 1px, transparent 120px)",
+                      maskImage: "radial-gradient(72% 72% at 55% 35%, black 0%, transparent 82%)",
+                      WebkitMaskImage: "radial-gradient(72% 72% at 55% 35%, black 0%, transparent 82%)",
+                    }}
+                  />
+
+                  <div className="relative max-w-[58ch] space-y-6 text-muted-foreground leading-relaxed">
+                    <p>
+                      Most tools help teams get documents signed. Far fewer help them keep a clear, provable
+                      record of what happened across parties over time.
+                    </p>
+                    <p>
+                      That gap matters when questions arise, positions harden, or evidence is tested. We’re
+                      building beyond signing to make the record itself stronger.
+                    </p>
+                  </div>
+
+                  <div className="relative mt-7 max-w-md rounded-2xl border border-border/90 bg-background/75 px-5 py-4 shadow-[0_1px_0_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.7)]">
+                    <div className="flex items-start gap-3">
+                      <p className="text-sm text-foreground/85 leading-relaxed">
+                        <span className="mb-2 block">
+                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/80 bg-primary/10 text-primary">
+                            <ArrowRight className="h-4 w-4" />
+                          </span>
+                        </span>
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/60">
+                          Key shift
+                        </span>
+                        <span className="block mt-1">
+                          Signing is the start. The record is the real infrastructure.
+                        </span>
+                      </p>
+                    </div>
+                    <div
+                      aria-hidden="true"
+                      className="mt-3 h-px w-full"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(90deg, rgba(15,23,42,0.18) 0%, rgba(15,23,42,0.08) 45%, rgba(15,23,42,0) 100%)",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -419,24 +489,22 @@ const EarlyAccess = () => {
                 The problem
               </p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 leading-[1.12]">
-                Construction disputes start as{" "}
-                <span className="text-primary">documentation problems.</span>
+                Disputes start as documentation problems.
               </h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed max-w-xl">
                 <p>
-                  Different parties hold different slices of the record. Contracts,
-                  notices, variations, payment applications, and approvals live
-                  across multiple systems — email threads, shared drives, filing
-                  cabinets, and personal laptops.
+                  By the time a dispute becomes visible, the record is usually already fragmented.
+                  Different parties are working from different contracts, different notice trails,
+                  different approval histories, and different supporting documents.
                 </p>
                 <p>
-                  By the time a dispute escalates, the paper trail is scattered,
-                  incomplete, or contested. Different parties end up working from
-                  different versions of the story.
+                  What should be one provable project record becomes a scattered set of files across
+                  email threads, shared drives, filing cabinets, and personal laptops. That is where
+                  delay, duplication, doubt, and contest begin.
                 </p>
                 <p className="pt-2 text-foreground font-semibold">
-                  Teranode Sign keeps one provable record across all parties — so
-                  when disputes happen, the evidence is already in order.
+                  Teranode Sign is built to keep a clearer, provable record across parties from the start,
+                  so when pressure builds, the evidence is already structured and easier to trust.
                 </p>
               </div>
             </div>
@@ -462,8 +530,8 @@ const EarlyAccess = () => {
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                           Fragmentation
                         </p>
-                        <span className="mt-4 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
-                          <Users className="h-5 w-5" />
+                        <span className="mt-4 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
+                          <Users className="h-4 w-4" />
                         </span>
                         <h4 className="mt-3 text-base md:text-lg font-semibold tracking-tight">
                           Different parties, different records
@@ -491,8 +559,8 @@ const EarlyAccess = () => {
                   {/* Supporting cards (stacked underneath) */}
                   <div className="grid sm:grid-cols-3 gap-4">
                     <div className="rounded-xl border border-border bg-card/70 p-5 shadow-[0_1px_0_rgba(15,23,42,0.04)]">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
-                        <FileText className="h-5 w-5" />
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
+                        <FileText className="h-4 w-4" />
                       </span>
                       <h5 className="mt-3 text-sm font-semibold tracking-tight">
                         Contracts in email attachments
@@ -503,8 +571,8 @@ const EarlyAccess = () => {
                     </div>
 
                     <div className="rounded-xl border border-border bg-card/70 p-5">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
-                        <AlertTriangle className="h-5 w-5" />
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
+                        <AlertTriangle className="h-4 w-4" />
                       </span>
                       <h5 className="mt-3 text-sm font-semibold tracking-tight">
                         Variations with no audit trail
@@ -515,8 +583,8 @@ const EarlyAccess = () => {
                     </div>
 
                     <div className="rounded-xl border border-border bg-card/70 p-5">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
-                        <Clock className="h-5 w-5" />
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary">
+                        <Clock className="h-4 w-4" />
                       </span>
                       <h5 className="mt-3 text-sm font-semibold tracking-tight">
                         Missed notice deadlines
@@ -542,64 +610,21 @@ const EarlyAccess = () => {
           {/* Label */}
           <div className="flex justify-center mb-10">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white bg-primary/30 border border-primary/40 px-4 py-1.5 rounded-full">
-              <Clock className="h-3 w-3" /> In development with pilot users
+              <Clock className="h-3 w-3" /> In pilot development
             </span>
           </div>
 
           {/* ─── What we're building ─── */}
           <Reveal>
-            <div className="text-center max-w-3xl mx-auto mb-20">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-5 text-white">
-                Built around real disputes, not just signatures.
-              </h2>
-              <p className="text-base md:text-lg text-white/70 leading-relaxed">
-                We're building features designed for multi-stakeholder construction
-                projects, consortia, joint delivery teams, and downstream
-                subcontracting relationships — where disputes happen and evidence
-                matters.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* ─── Built for Multi-party Workflows ─── */}
-          <Reveal>
-            <div className="grid md:grid-cols-2 gap-10 items-center mb-24">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4">
-                  <Users className="h-5 w-5 text-purple-300" />
-                </div>
-                <h3 className="text-2xl font-bold mb-3 text-white">Built for multi-party workflows</h3>
-                <p className="text-white/70 leading-relaxed mb-4">
-                  Many projects involve multiple organisations, suppliers,
-                  advisors, and delivery partners working across a shared but
-                  fragmented document trail. Teranode Sign maps documents across
-                  all parties so each organisation can see its own branch of the
-                  record with clarity and control.
-                </p>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  Especially relevant for construction, infrastructure, and other
-                  multi-stakeholder environments, it is designed for consortia,
-                  subcontracting chains, and cross-organisational workflows where
-                  documentation ownership and responsibility move across
-                  boundaries.
-                </p>
-              </div>
-              <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5 p-4 hover:border-primary/30 transition-colors duration-300">
-                <LandingMultipartyAnimatedSvg className="w-full h-auto" />
-              </div>
-            </div>
-          </Reveal>
-
-          {/* ─── Project Chain of Custody — main visual ─── */}
-          <Reveal>
             <div className="text-center max-w-3xl mx-auto mb-12">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mb-3">
+                Built around real disputes, not just signatures
+              </p>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-5 text-white">
                 Project Chain of Custody
               </h2>
               <p className="text-lg text-white/70 leading-relaxed">
-                Not just a contract — the entire project record. Every document,
-                every party, every branch of downstream responsibility — tracked,
-                time-stamped, and provable.
+                A shared, provable record of who issued, signed, received, challenged, or controlled a document over time.
               </p>
             </div>
           </Reveal>
@@ -631,19 +656,18 @@ const EarlyAccess = () => {
           <Reveal>
             <div className="grid md:grid-cols-3 gap-8 mb-16">
               <div className="text-center md:text-left">
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto md:mx-0">
-                  <Layers className="h-5 w-5 text-purple-300" />
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto md:mx-0">
+                  <Layers className="h-4 w-4 text-purple-300" />
                 </div>
-                <h3 className="font-bold mb-2 text-white">Multi-party, multi-branch</h3>
+                <h3 className="font-bold mb-2 text-white">Multi-party, multi-branch record</h3>
                 <p className="text-sm text-white/60 leading-relaxed">
-                  Contracts, variations, sub-contracts, and payment applications flow
-                  across multiple organisations — including consortia and joint
-                  delivery teams.
+                  Contracts, variations, and payment applications move across organisations — with
+                  a clear branch per party and a single story across the project.
                 </p>
               </div>
               <div className="text-center md:text-left">
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto md:mx-0">
-                  <Eye className="h-5 w-5 text-purple-300" />
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto md:mx-0">
+                  <Eye className="h-4 w-4 text-purple-300" />
                 </div>
                 <h3 className="font-bold mb-2 text-white">Control and visibility</h3>
                 <p className="text-sm text-white/60 leading-relaxed">
@@ -652,45 +676,75 @@ const EarlyAccess = () => {
                 </p>
               </div>
               <div className="text-center md:text-left">
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto md:mx-0">
-                  <FileCheck className="h-5 w-5 text-purple-300" />
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-3 mx-auto md:mx-0">
+                  <Download className="h-4 w-4 text-purple-300" />
                 </div>
-                <h3 className="font-bold mb-2 text-white">Provable and immutable</h3>
+                <h3 className="font-bold mb-2 text-white">Dispute-ready evidence</h3>
                 <p className="text-sm text-white/60 leading-relaxed">
-                  Every document, every timestamp, every transfer of control is
-                  anchored to the blockchain. No party can alter the record after the fact.
+                  Preserve history across parties and export a complete evidence bundle when a
+                  record is challenged — with verification built in.
                 </p>
               </div>
             </div>
           </Reveal>
 
+          {/* ─── Built for Multi-party Workflows ─── */}
           <Reveal>
-            <div className="text-center mb-24">
-              <Button size="lg" onClick={scrollToSignup} className="bg-primary text-white hover:bg-primary/80 text-base px-8">
-                Join the pilot programme <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-base px-8 mt-3 sm:mt-0 sm:ml-3"
-                asChild
-              >
-                <Link to="/">
-                  See Project Chain of Custody prototype <ChevronRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+            <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
+              <div>
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-4">
+                  <Users className="h-4 w-4 text-purple-300" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-white">Built for multi-party workflows</h3>
+                <p className="text-white/70 leading-relaxed">
+                  Construction documentation moves across organisations. Teranode Sign maps records across
+                  parties so each team can see its own branch with clarity and control.
+                </p>
+              </div>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5 p-4 hover:border-primary/30 transition-colors duration-300">
+                <LandingMultipartyAnimatedSvg className="w-full h-auto" />
+              </div>
             </div>
           </Reveal>
 
-          {/* Divider */}
-          <div className="border-t border-white/10 mb-20" />
+          <Reveal>
+            <div className="flex justify-center mb-20">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="text-base px-8 bg-white/10 text-white border-white/20 hover:bg-white/15"
+                >
+                  <Link to="/">Explore the prototype</Link>
+                </Button>
+                <Button size="lg" onClick={scrollToSignup} className="bg-primary text-white hover:bg-primary/80 text-base px-8">
+                  Apply to join the pilot <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* (CTA block removed — keep pilot conversion focused near the bottom.) */}
+
+          <Reveal>
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
+                Chain of custody features
+              </h3>
+              <p className="text-white/60 leading-relaxed">
+                Built for contested records: surface disputed documents, preserve history across parties,
+                and export a complete evidence bundle when it matters.
+              </p>
+            </div>
+          </Reveal>
 
           {/* ─── Dispute Mode ─── */}
           <Reveal>
             <div className="grid md:grid-cols-2 gap-10 items-center mb-20">
               <div>
-                <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center mb-4">
-                  <AlertTriangle className="h-5 w-5 text-red-400" />
+                <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center mb-4">
+                  <AlertTriangle className="h-4 w-4 text-red-400" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-white">Dispute Mode</h3>
                 <p className="text-white/70 leading-relaxed mb-4">
@@ -699,9 +753,6 @@ const EarlyAccess = () => {
                   entire chain of custody is frozen and protected — ready for
                   adjudication, not just filing.
                 </p>
-                <Button size="sm" onClick={scrollToSignup} className="bg-primary text-white hover:bg-primary/80">
-                  Learn more <ChevronRight className="ml-1.5 h-3.5 w-3.5" />
-                </Button>
               </div>
               <div className="rounded-xl border border-white/10 bg-white/5 p-4 hover:border-red-500/20 transition-colors duration-300">
                 <LandingDisputeModeAnimatedSvg className="w-full h-auto" />
@@ -716,8 +767,8 @@ const EarlyAccess = () => {
                 <img src={landingEvidenceExport} alt="One-click evidence export bundle" className="w-full h-auto" loading="lazy" />
               </div>
               <div className="order-1 md:order-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4">
-                  <Download className="h-5 w-5 text-purple-300" />
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-4">
+                  <Download className="h-4 w-4 text-purple-300" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-white">One-click evidence export</h3>
                 <p className="text-white/70 leading-relaxed mb-4">
@@ -725,11 +776,6 @@ const EarlyAccess = () => {
                   verification, chain of custody record, and party access log — ready
                   for adjudicators, lawyers, or mediators. One click, one PDF.
                 </p>
-                <Button size="sm" asChild className="bg-primary text-white hover:bg-primary/80">
-                  <Link to="/">
-                    Learn more <ChevronRight className="ml-1.5 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
               </div>
             </div>
           </Reveal>
@@ -737,197 +783,55 @@ const EarlyAccess = () => {
           {/* Divider */}
           <div className="border-t border-white/10 mb-20" />
 
-          {/* ─── WHO THIS PILOT IS FOR ─── */}
-          <Reveal>
-            <div className="mb-24">
-              <div className="max-w-6xl mx-auto mb-10">
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
-                  Who this pilot is for
-                </h2>
-                <p className="text-white/60 leading-relaxed mb-8">
-                  We&apos;re looking for construction teams who deal with real documentation challenges and
-                  want to help shape a better solution.
-                </p>
-                <p
-                  className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white mb-3"
-                  style={{ backgroundColor: "rgb(40, 175, 96)" }}
-                >
-                  We&apos;re looking for pilot participants
-                </p>
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
-                  Built for teams with real documentation pressure.
-                </h2>
-                <p className="text-white/60 leading-relaxed">
-                  Dispute bundles, audit history, and ready-to-share proof with 1 click.
-                </p>
-              </div>
-
-              <div className="max-w-6xl mx-auto">
-                <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-6 md:p-7 shadow-[0_12px_32px_rgba(2,6,23,0.35)]">
-                    <h3 className="text-lg font-semibold text-white mb-3">Best suited to this pilot</h3>
-                    <p className="text-sm text-white/60 leading-relaxed mb-6">
-                      Developers, main contractors, commercial managers, QSs, legal teams, and project
-                      managers dealing with payment disputes, adjudication, or contentious variations, or
-                      complex documentcontrol across multiple parties.
-                    </p>
-
-                    <h4 className="text-sm font-semibold text-white/80 mb-3">What makes a strong fit?</h4>
-                    <ul className="space-y-2">
-                      {[
-                        "Active projects with real documentation pain points.",
-                        "Responsibility for evidence, compliance, or contractual records.",
-                        "Willingness to give feedback during the pilot.",
-                      ].map((t) => (
-                        <li key={t} className="flex items-start gap-3 text-sm text-white/70">
-                          <span className="mt-2 h-2 w-2 rounded-full bg-teal-400 shrink-0" />
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="rounded-2xl bg-white border border-slate-200/80 p-6 md:p-7 shadow-[0_12px_32px_rgba(2,6,23,0.25)]">
-                    <div className="flex justify-center mb-3">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-teal-500 text-white">
-                        Ideal pilot team
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900 text-center mb-5">
-                      Strong fit pilot profile
-                    </h3>
-                    <ul className="space-y-3 max-w-sm mx-auto">
-                      {[
-                        "Developers & main contractors",
-                        "Commercial managers & QSs",
-                        "Consortia and joint delivery teams",
-                        "Specialist subcontractors",
-                        "Legal teams and project managers",
-                      ].map((t) => (
-                        <li key={t} className="flex items-start gap-3 text-sm text-slate-700">
-                          <span className="mt-2 h-2 w-2 rounded-full bg-teal-500 shrink-0" />
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-6 md:p-7 shadow-[0_12px_32px_rgba(2,6,23,0.35)] mb-12">
-                  <h3 className="text-lg font-semibold text-white mb-5">What you can expect</h3>
-                  <div className="grid md:grid-cols-3 gap-4 md:gap-5">
-                    {[
-                      {
-                        color: "teal",
-                        text: "Better visibility into what was issued, signed, or disputed, with provable records of your own submissions.",
-                      },
-                      {
-                        color: "amber",
-                        text: "Better control where documentation ownership and responsibility move across organisational boundaries.",
-                      },
-                      {
-                        color: "teal",
-                        text: "Stronger dispute readiness, audit trails, and evidential clarity across contentious records and project history.",
-                      },
-                    ].map(({ color, text }) => (
-                      <div
-                        key={text}
-                        className="rounded-2xl bg-white border border-slate-200/80 p-5 shadow-[0_10px_24px_rgba(2,6,23,0.18)]"
-                      >
-                        <div
-                          className={[
-                            "w-8 h-8 rounded-full flex items-center justify-center mb-4",
-                            color === "amber" ? "bg-amber-500" : "bg-teal-500",
-                          ].join(" ")}
-                        >
-                          <Plus className="h-4 w-4 text-white" />
-                        </div>
-                        <p className="text-sm text-slate-700 leading-relaxed">{text}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap justify-center gap-3">
-                <Button asChild className="bg-primary text-white hover:bg-primary/80">
-                  <Link to="/">
-                    See Project Chain of Custody prototype <ChevronRight className="ml-1.5 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-white text-foreground border-white/20 hover:bg-white/90 hover:text-slate-900"
-                  asChild
-                >
-                  <a href="mailto:contact@teranode.io">Talk to us</a>
-                </Button>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Divider */}
-          <div className="border-t border-white/10 mb-20" />
-
-          {/* ─── WHY TERANODE SIGN ─── */}
-          <Reveal>
-            <div className="mb-24">
-              <div className="text-center max-w-2xl mx-auto mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-4">
-                  Why Teranode Sign
-                </h2>
-                <p className="text-white/60 leading-relaxed">
-                  Security, auditability, and deployment flexibility — built for
-                  regulated industries and multi-stakeholder workflows.
-                </p>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
-                {[
-                  {
-                    icon: Shield,
-                    title: "Secure and compliant",
-                    desc: "Signing workflows designed for regulated industries — construction, infrastructure, and engineering.",
-                  },
-                  {
-                    icon: Link2,
-                    title: "Tamper-proof records",
-                    desc: "Blockchain verification means no one can alter a record after the fact.",
-                  },
-                  {
-                    icon: Server,
-                    title: "Full control over data",
-                    desc: "Choose cloud-hosted isolated environments or on-premises deployment.",
-                  },
-                  {
-                    icon: Users,
-                    title: "Role-based access",
-                    desc: "Separate permissions for requestors, signers, and third parties.",
-                  },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-center hover:border-primary/20 transition-colors duration-300">
-                    <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-3 mx-auto">
-                      <Icon className="h-5 w-5 text-purple-300" />
-                    </div>
-                    <h3 className="font-semibold text-sm text-white mb-2">{title}</h3>
-                    <p className="text-xs text-white/60 leading-relaxed">{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          {/* ─── SIGNUP FORM ─── */}
+          {/* ─── PILOT FIT + APPLICATION ─── */}
           <Reveal>
             <div id="signup" className="max-w-2xl mx-auto">
-              <div className="text-center mb-8">
+              <div className="text-center mb-10">
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3 text-[rgb(40,175,96)]">
+                  Pilot application
+                </p>
                 <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
-                  Join the pilot / early access
+                  Apply to join the pilot programme
                 </h2>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  This is for companies who want to try the app now and help shape
-                  the next set of dispute-focused features. We'll review every
-                  application personally.
+                  We’re onboarding a small number of teams to shape dispute-focused features like
+                  chain of custody and evidence export. We review each application personally and
+                  onboard teams that are a strong fit for the current pilot.
                 </p>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-6 mb-10">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                  <h3 className="text-sm font-semibold text-white mb-3">Best fit for</h3>
+                  <ul className="space-y-2">
+                    {[
+                      "Teams dealing with payment disputes, adjudication, or contentious variations.",
+                      "Projects where documentation ownership moves across organisations.",
+                      "People responsible for evidence, compliance, or contractual records.",
+                    ].map((t) => (
+                      <li key={t} className="flex items-start gap-3 text-sm text-white/70">
+                        <span className="mt-2 h-2 w-2 rounded-full bg-[rgb(40,175,96)] shrink-0" />
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                  <h3 className="text-sm font-semibold text-white mb-3">What you’ll get</h3>
+                  <ul className="space-y-2">
+                    {[
+                      "Early access to pilot workflows and prototype updates.",
+                      "A clearer, provable record across parties for contentious documents.",
+                      "A direct feedback loop with the team building the product.",
+                    ].map((t) => (
+                      <li key={t} className="flex items-start gap-3 text-sm text-white/70">
+                        <span className="mt-2 h-2 w-2 rounded-full bg-[rgb(40,175,96)] shrink-0" />
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
               {submitted ? (
@@ -1032,10 +936,30 @@ const EarlyAccess = () => {
             Secure document workflows with blockchain-backed proof and role-based control.
           </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
-            <a href={LOGIN_URL} className="hover:text-foreground transition-colors">Login</a>
-            <a href={DOCS_URL} className="hover:text-foreground transition-colors">Documentation</a>
-            <a href="mailto:contact@teranode.io" className="hover:text-foreground transition-colors">Contact</a>
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
+            <a
+              href={LOGIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              Login
+            </a>
+            <a
+              href={DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              Documentation
+            </a>
+            <a
+              href="mailto:contact@teranode.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              Contact
+            </a>
           </div>
         </div>
       </footer>

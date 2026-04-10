@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Teranode Sign landing page
 
 TODO: Document your project here
