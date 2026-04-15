@@ -8,6 +8,11 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Avoid accidentally viewing a stale bundle on 8080 while Vite silently moves to another port.
+    strictPort: true,
+    headers: {
+      "Cache-Control": "no-store",
+    },
     hmr: {
       overlay: false,
     },
