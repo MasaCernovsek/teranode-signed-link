@@ -202,9 +202,9 @@ const ProductLanding = () => {
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[380px_minmax(0,1fr)] lg:items-start lg:gap-x-14 lg:gap-y-0 xl:gap-x-20">
             <Reveal className="min-w-0">
-              <div className="mb-0 max-w-[30ch] lg:sticky lg:top-28 lg:mb-0 lg:max-w-[380px]">
+              <div className="mb-0 max-w-xl lg:sticky lg:top-28 lg:mb-0 lg:max-w-[380px]">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary">
-                  Why teams choose Teranode Sign
+                  Why teams choose Teranode Sign over other tools
                 </p>
                 <h2 className="mb-5 text-2xl font-bold leading-tight tracking-tight text-balance md:mb-6 md:text-3xl xl:text-[2rem]">
                   Built beyond
@@ -250,9 +250,9 @@ const ProductLanding = () => {
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
                       <FolderOpen className="h-4 w-4 text-primary" aria-hidden />
                     </div>
-                    <h3 className="mb-2 text-[15px] font-semibold text-foreground">Organised project records</h3>
+                    <h3 className="mb-2 text-[15px] font-semibold text-foreground">Organised records</h3>
                     <p className="text-sm text-muted-foreground leading-[1.65]">
-                      Contracts, notices, and approvals—indexed and retrievable when reviews or claims land.
+                      Contracts, notices, and approvals—tagged, indexed, and retrievable when reviews or claims land.
                     </p>
                   </div>
                 </Reveal>
@@ -266,7 +266,8 @@ const ProductLanding = () => {
                     <div className="min-w-0">
                       <h3 className="mb-1 text-[15px] font-semibold text-foreground/90">Built for important agreements</h3>
                       <p className="text-sm text-muted-foreground leading-[1.65]">
-                        Reminders, tags, and access rules for files where deadlines and accountability actually matter.
+                        Action dates, reminders, tags, and access rules for files where deadlines and accountability
+                        actually matter.
                       </p>
                     </div>
                   </div>
