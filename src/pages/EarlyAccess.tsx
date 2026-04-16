@@ -714,7 +714,7 @@ const EarlyAccess = () => {
                         Project Chain of custody
                       </span>
                       <span className="text-[11px] font-medium leading-snug text-white/75 transition-colors group-hover:text-white/90">
-                        See Prototype
+                        See what we&apos;re designing
                       </span>
                     </span>
                   </Link>
