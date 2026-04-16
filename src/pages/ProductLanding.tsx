@@ -126,14 +126,16 @@ const ProductLanding = () => {
         <div className="mx-auto max-w-7xl px-4 pb-6 pt-12 sm:px-6 sm:pt-14 md:pb-12 md:pt-20">
           <div className="mx-auto mb-6 max-w-2xl text-center md:mb-10">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary sm:mb-4">
-              Provable document signing for multi-party teams
+              Signed records for high-stakes, multi-party work
             </p>
             <h1 className="mb-4 text-[1.6875rem] font-extrabold leading-[1.12] tracking-tight text-balance sm:mb-5 sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
-              Sign and verify high-stakes project records in one place.
+              Sign records, not
+              <br />
+              just documents.
             </h1>
             <p className="mx-auto mb-6 max-w-[min(100%,22rem)] text-[15px] leading-relaxed text-muted-foreground sm:mb-8 sm:max-w-xl sm:text-base md:text-lg">
-              Teranode Sign helps project, legal, and commercial teams collect signatures, verify files against
-              independent blockchain proof, and keep clearer records in one system.
+              Teranode Sign helps construction, commercial, legal, and HR teams create signed, independently verifiable
+              records with clearer audit trails, stronger evidence, and less ambiguity when questions arise later.
             </p>
             <div className="mb-3 flex flex-col items-stretch justify-center gap-3 sm:mb-4 sm:flex-row sm:items-center">
               <Button
@@ -145,14 +147,14 @@ const ProductLanding = () => {
                   href={SIGNUP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={CTA_A11Y.startFreeNewTab}
+                  aria-label={CTA_A11Y.seeWhatsLiveTodayNewTab}
                 >
-                  <span aria-hidden>Start for free</span>
+                  <span aria-hidden>See what&apos;s live today</span>
                 </a>
               </Button>
             </div>
             <p className="text-sm leading-snug text-muted-foreground sm:leading-normal">
-              No sales call required. Start with your first document in minutes.
+              Explore the live product and see what works today.
             </p>
           </div>
 
@@ -175,11 +177,11 @@ const ProductLanding = () => {
               </li>
               <li className="flex items-start gap-3.5 rounded-xl border border-border/80 bg-card/90 px-4 py-4 text-[15px] font-semibold leading-snug text-foreground antialiased shadow-sm sm:items-center sm:text-[15px] sm:leading-normal">
                 <Link2 className="mt-0.5 h-5 w-5 shrink-0 text-primary sm:mt-0" aria-hidden />
-                <span className="text-foreground">Signatures checked on-chain</span>
+                <span className="text-foreground">Independently verifiable records</span>
               </li>
               <li className="flex items-start gap-3.5 rounded-xl border border-border/80 bg-card/90 px-4 py-4 text-[15px] font-semibold leading-snug text-foreground antialiased shadow-sm sm:items-center sm:text-[15px] sm:leading-normal">
                 <Users className="mt-0.5 h-5 w-5 shrink-0 text-primary sm:mt-0" aria-hidden />
-                <span className="text-foreground">Multi-party signing &amp; roles</span>
+                <span className="text-foreground">Multi-party signing and roles</span>
               </li>
             </ul>
           </Reveal>
@@ -193,10 +195,12 @@ const ProductLanding = () => {
             <Reveal className="min-w-0">
               <div className="mb-0 max-w-[30ch] lg:sticky lg:top-28 lg:mb-0 lg:max-w-[380px]">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary">
-                  How Teranode Sign is different
+                  Why teams choose Teranode Sign
                 </p>
                 <h2 className="mb-5 text-2xl font-bold leading-tight tracking-tight text-balance md:mb-6 md:text-3xl xl:text-[2rem]">
-                  Not just another signing tool
+                  Built beyond
+                  <br />
+                  signature workflows
                 </h2>
                 <p className="text-[15px] leading-[1.65] text-muted-foreground">
                   More than a signature request, you get a provable trail of what was sent, signed, verified, and managed
