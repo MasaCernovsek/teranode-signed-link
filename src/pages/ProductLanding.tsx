@@ -613,10 +613,10 @@ const ProductLanding = () => {
           <Reveal>
             <div className="rounded-2xl border-2 border-border/55 bg-card px-5 py-10 text-center shadow-[0_4px_28px_-10px_rgba(15,23,42,0.1)] sm:px-8 md:px-12 md:py-14 dark:border-border/60 dark:shadow-[0_4px_28px_-10px_rgba(0,0,0,0.35)]">
               <h2 className="mb-5 text-2xl font-bold tracking-tight text-balance sm:text-3xl md:mb-6 md:text-4xl">
-                Create your first provable record today
+                Create your first signed document today
               </h2>
               <p className="mx-auto mb-8 max-w-lg text-[15px] leading-relaxed text-muted-foreground text-pretty sm:mb-9 md:mb-10 md:text-base">
-                Upload a file, send it for signature, and verify it in minutes—in the live app, not a demo.
+                Upload a file, send it for signature, and track who signed and when.
               </p>
               <Button
                 size="lg"
