@@ -84,6 +84,8 @@ const CONTAINER = {
 const EarlyAccess = () => {
   const location = useLocation();
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [heroCtasInView, setHeroCtasInView] = useState(true);
   const heroCtasRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
@@ -125,9 +127,53 @@ const EarlyAccess = () => {
     return () => obs.disconnect();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const DESIGN_PARTNER_APPLICATION_EMAIL = "m.cernovseklogar@teranode.group";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(
+        `https://formsubmit.co/ajax/${encodeURIComponent(DESIGN_PARTNER_APPLICATION_EMAIL)}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            company: form.company,
+            role: form.role || "—",
+            company_type: form.companyType || "—",
+            pain: form.pain || "—",
+            _subject: "Design partner application",
+          }),
+        }
+      );
+      const data = (await res.json().catch(() => null)) as { success?: boolean; message?: string } | null;
+      if (!res.ok) {
+        throw new Error(
+          typeof data?.message === "string" && data.message
+            ? data.message
+            : "Could not send your application. Please try again."
+        );
+      }
+      if (data && "success" in data && data.success === false) {
+        throw new Error(
+          typeof data.message === "string" && data.message
+            ? data.message
+            : "Could not send your application. Please try again."
+        );
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const scrollToSignup = () => {
@@ -897,9 +943,19 @@ const EarlyAccess = () => {
                       className="min-h-[88px]"
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
-                    Submit application
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-70"
+                    size="lg"
+                  >
+                    {isSubmitting ? "Sending…" : "Submit application"}
                   </Button>
+                  {submitError ? (
+                    <p className="text-center text-sm text-destructive" role="alert">
+                      {submitError}
+                    </p>
+                  ) : null}
                   <p className="text-center text-xs text-muted-foreground">
                     By applying you are not committing to purchase—you are asking to join a working programme we run with a
                     limited number of teams.
