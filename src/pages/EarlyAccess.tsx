@@ -367,27 +367,29 @@ const EarlyAccess = () => {
         <div className={`grid items-start gap-10 md:grid-cols-2 md:gap-12 ${CONTAINER.standard}`}>
           <Reveal>
             <div>
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">The problem</p>
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">The pain</p>
               <h2 className="mb-6 text-3xl font-bold leading-[1.12] tracking-tight md:text-4xl">
-                Disputes start as documentation problems.
+                When you can&apos;t see what really happened.
               </h2>
               <div className="max-w-xl space-y-5 leading-relaxed text-muted-foreground">
                 <p>
-                  By the time a dispute becomes visible, the record is usually already fragmented. Different parties are
-                  working from different contracts, different notice trails, different approval histories, and different
-                  supporting documents.
+                  When something goes wrong, nobody can see a single, trusted story of what was sent, signed, and handed
+                  off. Different teams and parties hold different versions, and you lose hours reconstructing the record
+                  just to have a conversation.
                 </p>
-                <p className="font-medium text-foreground/90">
-                  Fragmentation is the default — until it becomes a dispute problem.
-                </p>
-                <p>
-                  What should be one provable project record becomes a scattered set of files across email threads,
-                  shared drives, filing cabinets, and personal laptops. That is where delay, duplication, doubt, and
-                  contest begin.
-                </p>
-                <p className="pt-2 font-semibold text-foreground">
-                  Teranode Sign is built to keep a clearer, provable record across parties from the start, so when
-                  pressure builds, the evidence is already structured and easier to trust.
+                <div className="space-y-3 pt-1">
+                  <p className="font-medium text-foreground/90">Does this sound familiar?</p>
+                  <ul className="list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-muted-foreground marker:text-primary/80">
+                    <li>Documents live in email, shared drives, and separate signing tools.</li>
+                    <li>Approvals and notices aren&apos;t tracked anywhere central.</li>
+                    <li>Each party has their own &apos;version&apos; of the truth.</li>
+                    <li>By the time a dispute surfaces, the record is already messy.</li>
+                  </ul>
+                </div>
+                <p className="pt-2 text-foreground">
+                  That&apos;s what we&apos;re exploring with Project Chain of Custody: a shared, project-level chain for
+                  documents and evidence, so when questions land you can show a clear, time-stamped story instead of
+                  piecing it together by hand.
                 </p>
               </div>
             </div>
