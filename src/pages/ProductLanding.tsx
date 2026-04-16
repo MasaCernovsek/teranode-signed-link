@@ -133,7 +133,7 @@ const ProductLanding = () => {
               Trusted e-signatures with a clear audit trail
             </p>
             <h1 className="mb-4 text-[1.6875rem] font-extrabold leading-[1.12] tracking-tight text-balance sm:mb-5 sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
-              Sign documents and keep proof in one place.
+              Request signatures and track every action.
             </h1>
             <p className="mx-auto mb-6 max-w-[min(100%,22rem)] text-[15px] leading-relaxed text-muted-foreground sm:mb-8 sm:max-w-2xl sm:text-base md:text-lg">
               Teranode Sign lets teams send documents for signature, track who signed and when, and keep everything in a
