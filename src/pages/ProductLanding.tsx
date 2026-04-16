@@ -25,6 +25,7 @@ import {
   Briefcase,
   Building2,
   Scale,
+  UserCheck,
 } from "lucide-react";
 
 import teranodeLogo from "@/assets/teranode-logo.svg";
@@ -78,13 +79,15 @@ function Reveal({
 const SIGNUP_URL = "https://sign.products.teranode.group/signup";
 const DOCS_URL = "https://docs.teranode.group/teranode-sign";
 const LOGIN_URL = "https://sign.products.teranode.group/login";
+const BOOK_DEMO_URL =
+  "mailto:contact@teranode.io?subject=Book%20a%20demo%20%E2%80%94%20Teranode%20Sign";
 
 const trialButtonClass =
   "border-[rgb(40,175,96)] bg-[rgb(40,175,96)] text-white hover:bg-white hover:text-slate-900";
 
 const ProductLanding = () => {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto flex h-14 items-center justify-between gap-2 px-4 sm:px-6">
           <Link to="/product" className="flex items-center gap-2">
@@ -120,24 +123,23 @@ const ProductLanding = () => {
         </div>
       </nav>
 
+      <div className="overflow-x-hidden">
       {/* SECTION 1 — HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute -top-20 -right-20 w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 pb-6 pt-12 sm:px-6 sm:pt-14 md:pb-12 md:pt-20">
           <div className="mx-auto mb-6 max-w-2xl text-center md:mb-10">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary sm:mb-4">
-              Signed records for high-stakes, multi-party work
+              Trusted e-signatures with a clear audit trail
             </p>
             <h1 className="mb-4 text-[1.6875rem] font-extrabold leading-[1.12] tracking-tight text-balance sm:mb-5 sm:text-4xl md:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
-              Sign records, not
-              <br />
-              just documents.
+              Sign documents and keep proof in one place.
             </h1>
-            <p className="mx-auto mb-6 max-w-[min(100%,22rem)] text-[15px] leading-relaxed text-muted-foreground sm:mb-8 sm:max-w-xl sm:text-base md:text-lg">
-              Teranode Sign helps construction, commercial, legal, and HR teams create signed, independently verifiable
-              records with clearer audit trails, stronger evidence, and less ambiguity when questions arise later.
+            <p className="mx-auto mb-6 max-w-[min(100%,22rem)] text-[15px] leading-relaxed text-muted-foreground sm:mb-8 sm:max-w-2xl sm:text-base md:text-lg">
+              Teranode Sign lets teams send documents for signature, track who signed and when, and keep everything in a
+              single, searchable audit trail that&apos;s easy to export when you need it.
             </p>
-            <div className="mb-3 flex flex-col items-stretch justify-center gap-3 sm:mb-4 sm:flex-row sm:items-center">
+            <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-center">
               <Button
                 size="lg"
                 className={`h-12 min-h-12 w-full touch-manipulation px-8 text-base shadow-md sm:w-auto sm:min-w-[12rem] ${trialButtonClass}`}
@@ -147,15 +149,22 @@ const ProductLanding = () => {
                   href={SIGNUP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={CTA_A11Y.seeWhatsLiveTodayNewTab}
+                  aria-label={CTA_A11Y.startFreeNewTab}
                 >
-                  <span aria-hidden>See what&apos;s live today</span>
+                  <span aria-hidden>Start for free</span>
+                </a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 min-h-12 w-full touch-manipulation border-border/80 bg-background px-8 text-base shadow-sm sm:w-auto sm:min-w-[12rem]"
+                asChild
+              >
+                <a href={BOOK_DEMO_URL} aria-label={CTA_A11Y.bookDemoMailto}>
+                  <span aria-hidden>Book a Demo</span>
                 </a>
               </Button>
             </div>
-            <p className="text-sm leading-snug text-muted-foreground sm:leading-normal">
-              Explore the live product and see what works today.
-            </p>
           </div>
 
           <Reveal>
@@ -203,8 +212,8 @@ const ProductLanding = () => {
                   signature workflows
                 </h2>
                 <p className="text-[15px] leading-[1.65] text-muted-foreground">
-                  More than a signature request, you get a provable trail of what was sent, signed, verified, and managed
-                  across critical documents.
+                  Most e-sign tools stop at collecting signatures. Teranode Sign also gives you a clear, exportable
+                  history of signatures and document versions, so you can see what was agreed and when.
                 </p>
               </div>
             </Reveal>
@@ -255,7 +264,7 @@ const ProductLanding = () => {
                       <Shield className="h-4 w-4 text-primary" aria-hidden />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="mb-1 text-[15px] font-semibold text-foreground/90">Built for high-stakes documents</h3>
+                      <h3 className="mb-1 text-[15px] font-semibold text-foreground/90">Built for important agreements</h3>
                       <p className="text-sm text-muted-foreground leading-[1.65]">
                         Reminders, tags, and access rules for files where deadlines and accountability actually matter.
                       </p>
@@ -275,7 +284,7 @@ const ProductLanding = () => {
             <div className="mb-8 max-w-xl md:mb-10">
               <h2 className="mb-2.5 text-3xl font-bold tracking-tight text-balance md:text-4xl">What&apos;s live now</h2>
               <p className="text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-base">
-                Real product—live now. Everything below works in the app today for signing and timestamps.
+                Used by legal, project, and HR teams today. These features are available in the app today.
               </p>
             </div>
           </Reveal>
@@ -431,52 +440,62 @@ const ProductLanding = () => {
                   Who it&apos;s for
                 </p>
                 <h2 className="mb-3 text-2xl font-bold leading-[1.15] tracking-tight text-balance md:mb-4 md:text-3xl xl:text-[2.125rem]">
-                  Built for teams managing important project records
+                  Built for teams that need signed agreements and a reliable history
                 </h2>
                 <p className="text-[15px] leading-[1.65] text-muted-foreground text-pretty">
-                  When a signature request isn&apos;t enough: project, commercial, and legal teams use Teranode Sign to
-                  keep records organised and independently verifiable.
+                  Teranode Sign helps project, commercial, legal, and HR teams send agreements for signature and keep a
+                  clear history of what was sent, signed, and when.
                 </p>
               </div>
             </Reveal>
 
             <div className="min-w-0">
-              <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="grid gap-3 sm:grid-cols-2 sm:items-stretch sm:gap-3 lg:gap-4">
                 <Reveal>
-                  <div className="rounded-xl border border-border/40 bg-muted/10 p-3.5 sm:p-4 dark:bg-muted/10">
+                  <div className="flex h-full flex-col rounded-xl border border-border/40 bg-background p-3.5 sm:p-4">
                     <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                       <Briefcase className="h-4 w-4 text-primary" aria-hidden />
                     </div>
                     <h3 className="mb-1.5 text-[15px] font-semibold text-foreground">Project teams</h3>
                     <p className="text-sm text-muted-foreground leading-[1.65]">
-                      Contracts, notices, and approvals—organised and easy to pull when work accelerates.
+                      Contracts, notices, and approvals—organised and easy to pull when work moves quickly.
                     </p>
                   </div>
                 </Reveal>
-                <div className="grid gap-3 sm:grid-cols-2 sm:items-stretch sm:gap-3">
-                  <Reveal>
-                    <div className="flex h-full flex-col rounded-xl border border-border/40 bg-background p-3.5 sm:p-4">
-                      <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                        <Building2 className="h-4 w-4 text-primary" aria-hidden />
-                      </div>
-                      <h3 className="mb-1.5 text-[15px] font-semibold text-foreground">Commercial teams</h3>
-                      <p className="text-sm text-muted-foreground leading-[1.65]">
-                        Track flows and reminders; show what was sent, signed, and when on critical deals.
-                      </p>
+                <Reveal>
+                  <div className="flex h-full flex-col rounded-xl border border-border/40 bg-background p-3.5 sm:p-4">
+                    <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                      <Building2 className="h-4 w-4 text-primary" aria-hidden />
                     </div>
-                  </Reveal>
-                  <Reveal>
-                    <div className="flex h-full flex-col rounded-xl border border-border/40 bg-background p-3.5 sm:p-4">
-                      <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                        <Scale className="h-4 w-4 text-primary" aria-hidden />
-                      </div>
-                      <h3 className="mb-1.5 text-[15px] font-semibold text-foreground">Legal teams</h3>
-                      <p className="text-sm text-muted-foreground leading-[1.65]">
-                        Verify without trusting a vendor narrative—cleaner trails when files face review.
-                      </p>
+                    <h3 className="mb-1.5 text-[15px] font-semibold text-foreground">Commercial teams</h3>
+                    <p className="text-sm text-muted-foreground leading-[1.65]">
+                      Track what was sent, signed, and chased, with reminders and a clearer trail on important deals.
+                    </p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="flex h-full flex-col rounded-xl border border-border/40 bg-background p-3.5 sm:p-4">
+                    <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                      <Scale className="h-4 w-4 text-primary" aria-hidden />
                     </div>
-                  </Reveal>
-                </div>
+                    <h3 className="mb-1.5 text-[15px] font-semibold text-foreground">Legal teams</h3>
+                    <p className="text-sm text-muted-foreground leading-[1.65]">
+                      Keep a cleaner audit trail of signatures and document history when files need review later.
+                    </p>
+                  </div>
+                </Reveal>
+                <Reveal>
+                  <div className="flex h-full flex-col rounded-xl border border-border/40 bg-background p-3.5 sm:p-4">
+                    <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                      <UserCheck className="h-4 w-4 text-primary" aria-hidden />
+                    </div>
+                    <h3 className="mb-1.5 text-[15px] font-semibold text-foreground">HR teams</h3>
+                    <p className="text-sm text-muted-foreground leading-[1.65]">
+                      Handle offer letters, onboarding documents, and employee agreements with a clear record of who
+                      signed what and when.
+                    </p>
+                  </div>
+                </Reveal>
               </div>
             </div>
           </div>
@@ -562,7 +581,7 @@ const ProductLanding = () => {
               Working on disputed multi-party records?
             </h2>
             <p className="mb-5 text-xs leading-relaxed text-white/70 text-pretty sm:mb-6 sm:text-sm">
-              We&apos;re designing chain-of-custody and evidence workflows for high-stakes disputes with a small set of
+              We&apos;re designing chain-of-custody and evidence workflows for complex disputes with a small set of
               design partners—separate from the live product above.
             </p>
             <Button
@@ -647,6 +666,7 @@ const ProductLanding = () => {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 };

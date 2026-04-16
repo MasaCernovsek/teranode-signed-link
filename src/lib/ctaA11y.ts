@@ -10,8 +10,8 @@ export const CTA_A11Y = {
   liveProductStacked: "See what's live today. Explore the live product.",
   /** Single-line signup (product page CTAs to external signup) */
   startFreeNewTab: "Start for free. Opens in a new tab.",
-  /** Hero primary CTA — live product (product page) */
-  seeWhatsLiveTodayNewTab: "See what's live today. Opens in a new tab.",
+  /** Hero secondary — book a demo (mailto) */
+  bookDemoMailto: "Book a demo. Opens your email client.",
   /** Nav / compact design partner control */
   navDesignPartner: "Become a design partner. Go to application form.",
   /** Dark section prototype link */
