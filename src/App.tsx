@@ -16,7 +16,7 @@ import ProductLanding from "./pages/ProductLanding.tsx";
 
 const queryClient = new QueryClient();
 
-/** Reset window scroll on client-side navigation (e.g. /chain-of-custody → /product at hero). */
+/** Reset window scroll on client-side navigation (e.g. marketing → /product). */
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -35,8 +35,8 @@ const App = () => (
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/early-access" element={<EarlyAccess />} />
-            <Route path="/chain-of-custody" element={<ChainOfCustody />} />
+            <Route path="/early-access" element={<ChainOfCustody />} />
+            <Route path="/chain-of-custody" element={<EarlyAccess />} />
             <Route path="/product" element={<ProductLanding />} />
             <Route path="/project/:id" element={<ProjectView />} />
             <Route path="/project/:id/envelope/:envId" element={<EnvelopeDetail />} />

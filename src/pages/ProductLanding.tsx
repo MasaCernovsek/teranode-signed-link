@@ -590,7 +590,7 @@ const ProductLanding = () => {
               className="h-auto min-h-12 w-full max-w-sm touch-manipulation bg-primary px-4 py-3 text-sm leading-snug text-primary-foreground shadow-sm hover:bg-primary/90 sm:mx-auto"
             >
               <Link
-                to="/chain-of-custody"
+                to="/early-access"
                 aria-label={CTA_A11Y.designPartnerProgramme}
                 className="inline-flex items-center justify-center gap-2"
               >
