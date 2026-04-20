@@ -18,4 +18,6 @@ export const CTA_A11Y = {
   prototypeStacked: "Project Chain of custody. See what we're designing.",
   /** Product page bridge to design partner programme */
   designPartnerProgramme: "Learn about the design-partner programme.",
+  /** Internal link to live product overview */
+  learnMoreProduct: "Learn more. Go to the Teranode Sign product page.",
 } as const;

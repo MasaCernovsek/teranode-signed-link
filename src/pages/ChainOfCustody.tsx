@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -422,13 +422,14 @@ const ChainOfCustody = () => {
                 What&apos;s live today
               </p>
               <p className="pdcc-hero-supporting-left-body text-base font-normal leading-relaxed text-white/70">
-                Teranode Sign is already live with legal, HR, and commercial teams for high-stakes agreements.
+                Teranode Sign is already used by legal, HR, and commercial teams to send and sign documents across
+                multiple parties with a clear record of who signed what, and when.
               </p>
               <div className="pdcc-hero-supporting-left-cta mt-5 w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto" asChild>
-                  <a href={SIGNUP_URL} target="_blank" rel="noopener noreferrer" aria-label={CTA_A11Y.startFreeNewTab}>
-                    <span aria-hidden>Start for free</span>
-                  </a>
+                  <Link to="/product" aria-label={CTA_A11Y.learnMoreProduct}>
+                    <span aria-hidden>Learn more</span>
+                  </Link>
                 </Button>
               </div>
               </div>
