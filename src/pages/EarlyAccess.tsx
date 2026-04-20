@@ -73,7 +73,7 @@ const PAGE_GUTTER = "px-6";
  * Design Partner layout system (3 widths only):
  * - narrow: hero copy, application intro + form (tightest reading column)
  * - standard: light sections — foundations, problem, partners, ideal partners; nav/footer align here
- * - wide: Project Chain of Custody (dark) + large visuals inside it
+ * - wide: Project Document Chain of Custody (dark) + large visuals inside it
  */
 const CONTAINER = {
   narrow: "mx-auto w-full max-w-2xl",
@@ -433,7 +433,7 @@ const EarlyAccess = () => {
                   </ul>
                 </div>
                 <p className="pt-2 text-foreground">
-                  That&apos;s what we&apos;re exploring with Project Chain of Custody: a shared, project-level chain for
+                  That&apos;s what we&apos;re exploring with Project Document Chain of Custody: a shared, project-level chain for
                   documents and evidence, so when questions land you can show a clear, time-stamped story instead of
                   piecing it together by hand.
                 </p>
@@ -639,7 +639,7 @@ const EarlyAccess = () => {
                 What partners help shape
               </p>
               <h2 className="mb-5 text-3xl font-extrabold tracking-tight text-white md:text-4xl lg:text-5xl">
-                Project Chain of Custody
+                Project Document Chain of Custody
               </h2>
               <p className="text-lg leading-relaxed text-white/70">
                 The direction below is not a finished roadmap—it is the problem space design partners are helping us
@@ -659,7 +659,7 @@ const EarlyAccess = () => {
                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
                     <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
                   </div>
-                  <span className="text-xs text-white/50 ml-2">Project Chain of Custody — Sample Project</span>
+                  <span className="text-xs text-white/50 ml-2">Project Document Chain of Custody — Sample Project</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-white/40">
                   <span className="px-2 py-0.5 bg-white/10 rounded font-medium text-white/70">Branch</span>
@@ -759,7 +759,7 @@ const EarlyAccess = () => {
                   >
                     <span aria-hidden className="flex flex-col items-center gap-0.5 text-center sm:items-start sm:text-left">
                       <span className="text-[15px] font-semibold leading-snug text-white transition-colors group-hover:text-white">
-                        Project Chain of custody
+                        Project Document Chain of custody
                       </span>
                       <span className="text-[11px] font-medium leading-snug text-white/75 transition-colors group-hover:text-white/90">
                         See what we&apos;re designing

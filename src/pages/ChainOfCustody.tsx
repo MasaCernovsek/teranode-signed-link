@@ -69,7 +69,7 @@ function Reveal({ children, className = "", delay = 0 }: { children: React.React
 const PAGE_GUTTER = "px-6";
 
 /**
- * Project Chain of Custody — width system (single grid, three tiers only):
+ * Project Document Chain of Custody — width system (single grid, three tiers only):
  * - standard: max-w-6xl — most sections, nav, footer inner
  * - wide: max-w-7xl — hero product visual only
  * - form: max-w-3xl — application panel only (intentional narrow)
@@ -81,7 +81,7 @@ const CONTAINER = {
 } as const;
 
 /**
- * Project Chain of Custody — full-page dark art direction (matches Early Access
+ * Project Document Chain of Custody — full-page dark art direction (matches Early Access
  * `id="chain-of-custody"`: `bg-[hsl(228,30%,10%)]`, `border-white/10`, `bg-white/5` panels,
  * `text-white` / `text-white/60–70` copy).
  */
@@ -298,7 +298,7 @@ const ChainOfCustody = () => {
             role: form.role || "—",
             company_type: form.companyType || "—",
             pain: form.pain || "—",
-            _subject: "Project Chain of Custody — design partner application",
+            _subject: "Project Document Chain of Custody — design partner application",
           }),
         }
       );
@@ -386,7 +386,7 @@ const ChainOfCustody = () => {
             <Reveal>
               <img
                 src={pdccHeroPcoc}
-                alt="Project Chain of Custody — product illustration"
+                alt="Project Document Chain of Custody — product illustration"
                 className="h-auto w-full"
                 loading="eager"
                 decoding="async"
@@ -397,19 +397,21 @@ const ChainOfCustody = () => {
 
         {/* Standard — hero copy below image */}
         <div className={`${CONTAINER.standard} pdcc-hero-copy-container mt-[40px]`}>
-            <p className="pdcc-hero-eyebrow mb-5 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-purple-300 md:text-xs">
+            <p className="pdcc-hero-eyebrow mb-2 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-purple-300 md:text-xs">
               WITH DESIGN PARTNERS
             </p>
-            <div className="pdcc-hero-main-text grid grid-cols-1 gap-y-6 text-left md:grid-cols-12 md:items-start md:gap-x-12 md:gap-y-0">
+            <div className="pdcc-hero-main-text grid grid-cols-1 gap-y-4 text-left md:grid-cols-12 md:items-start md:gap-x-10 md:gap-y-0">
               <div className="pdcc-hero-title-col text-left md:col-span-6">
-                <h1 className="pdcc-hero-title text-5xl font-extrabold leading-[1.04] tracking-tight text-white md:text-6xl lg:text-7xl lg:leading-[1.03]">
-                  Project Chain of Custody
+                <h1 className="pdcc-hero-title text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
+                  Project Document Chain of Custody
                 </h1>
               </div>
               <div className="pdcc-hero-tagline-col text-left md:col-span-6">
-                <p className="pdcc-hero-tagline text-lg font-semibold leading-snug text-white/90 md:text-left md:text-xl md:leading-snug lg:text-2xl">
-                  For teams who can&apos;t afford fuzzy records when things go wrong.
-                </p>
+                <div className="max-w-xl">
+                  <p className="pdcc-hero-tagline text-base font-normal leading-relaxed text-white/80 sm:text-lg md:text-left md:text-xl">
+                    For teams who can&apos;t afford fuzzy records when things go wrong.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -435,10 +437,10 @@ const ChainOfCustody = () => {
               </div>
               <div className="pdcc-hero-supporting-right md:col-span-6">
               <p className="pdcc-hero-supporting-right-label mb-3 text-xs font-semibold tracking-wide text-white/85">
-                What Project Chain of Custody adds
+                What Project Document Chain of Custody adds
               </p>
               <p className="pdcc-hero-supporting-right-body text-base font-normal leading-relaxed text-white/70">
-                Project Chain of Custody is the next layer: a shared, dispute-ready record of who issued, saw, signed, and
+                Project Document Chain of Custody is the next layer: a shared, dispute-ready record of who issued, saw, signed, and
                 controlled critical documents across a project.
               </p>
               <div className="pdcc-hero-supporting-right-cta mt-5 w-full sm:w-auto">
@@ -611,7 +613,7 @@ const ChainOfCustody = () => {
               <div className="mb-10 text-center">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-purple-300">Apply</p>
                 <h2 className="mb-3 text-2xl font-bold tracking-tight text-white md:text-3xl">
-                  Interested in shaping Project Chain of Custody?
+                  Interested in shaping Project Document Chain of Custody?
                 </h2>
                 <p className="text-sm leading-relaxed text-white/70">
                   We&apos;re working with a small group of teams where documentation and evidence already decide

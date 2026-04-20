@@ -15,7 +15,7 @@ export const CTA_A11Y = {
   /** Nav / compact design partner control */
   navDesignPartner: "Become a design partner. Go to application form.",
   /** Dark section prototype link */
-  prototypeStacked: "Project Chain of custody. See what we're designing.",
+  prototypeStacked: "Project Document Chain of custody. See what we're designing.",
   /** Product page bridge to design partner programme */
   designPartnerProgramme: "Learn about the design-partner programme.",
   /** Internal link to live product overview */
