@@ -574,7 +574,7 @@ const ProductLanding = () => {
         </div>
       </section>
 
-      {/* SECTION 8 — BRIDGE TO DESIGN-PARTNER PAGE (matches Early Access dark chain-of-custody section) */}
+      {/* SECTION 8 — BRIDGE TO PROJECT CHAIN OF CUSTODY / DESIGN-PARTNER LANDING */}
       <section className="border-t border-white/10 bg-[hsl(228,30%,10%)] px-4 py-12 sm:px-6 md:py-14">
         <div className="mx-auto max-w-md text-center">
           <Reveal>
@@ -590,7 +590,7 @@ const ProductLanding = () => {
               className="h-auto min-h-12 w-full max-w-sm touch-manipulation bg-primary px-4 py-3 text-sm leading-snug text-primary-foreground shadow-sm hover:bg-primary/90 sm:mx-auto"
             >
               <Link
-                to="/early-access"
+                to="/chain-of-custody"
                 aria-label={CTA_A11Y.designPartnerProgramme}
                 className="inline-flex items-center justify-center gap-2"
               >

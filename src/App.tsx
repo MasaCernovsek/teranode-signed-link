@@ -10,6 +10,7 @@ import DocumentDetail from "./pages/DocumentDetail.tsx";
 import EnvelopeDetail from "./pages/EnvelopeDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import EarlyAccess from "./pages/EarlyAccess.tsx";
+import ChainOfCustody from "./pages/ChainOfCustody.tsx";
 import ProductLanding from "./pages/ProductLanding.tsx";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/early-access" element={<EarlyAccess />} />
+            <Route path="/chain-of-custody" element={<ChainOfCustody />} />
             <Route path="/product" element={<ProductLanding />} />
             <Route path="/project/:id" element={<ProjectView />} />
             <Route path="/project/:id/envelope/:envId" element={<EnvelopeDetail />} />

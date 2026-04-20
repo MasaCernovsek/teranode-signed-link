@@ -9,6 +9,14 @@
   .bg-teal-500 {
     background-color: rgb(40, 175, 96) !important;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pdcc-payment-flow-card {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
 }
 
 @layer base {
